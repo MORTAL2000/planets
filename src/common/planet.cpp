@@ -1,22 +1,47 @@
 #include "planet.hpp"
 
+// Standard Headers
 #include <math.h>
-#include "glm/gtx/rotate_vector.hpp"
+#include <glm/gtx/rotate_vector.hpp>
 
-const float RAD_TO_DEGREES = 180.0f / M_PI;
+// Local Headers
+#include "graphics/vert_buffer.hpp"
+#include "utils/math_utils.h"
 
-Planet::Planet(float radius): sphere(radius) {
 
+Planet::Planet(PlanetConfig config): config(config), sphere(config.radius), name(config.name) {
+    std::cout << "Planet " << name << " created\n";
+
+    VertAttributes attrs;
+    attrs.add_(VertAttributes::POSITION)
+        .add_(VertAttributes::NORMAL)
+        .add_(VertAttributes::TANGENT)
+        .add_(VertAttributes::TEX_COORDS);
+
+    mesh = sphere.generate(config.name + "_mesh", config.segments, config.rings, attrs);
+    upload();
 } 
+
+void Planet::upload()
+{
+    // VertBuffer *buffer = NULL;
+    // for (auto isl : islands)
+    // {
+    //     if (!buffer) buffer = VertBuffer::with(isl->terrainMesh->attributes);
+    //     buffer->add(isl->terrainMesh);
+    // }
+    // if (buffer) buffer->upload(false);
+    VertBuffer::uploadSingleMesh(mesh);
+}
 
 float Planet::longitude(float x, float z) const
 {
-    return RAD_TO_DEGREES * std::atan2(z, x) + 180.0f;
+    return mu::RAD_TO_DEGREES * std::atan2(z, x) + 180.0f;
 }
 
 float Planet::latitude(float y) const
 {
-    return RAD_TO_DEGREES * glm::acos((y) / sphere.radius);
+    return mu::RAD_TO_DEGREES * glm::acos((y) / sphere.radius);
 }
 
 float minAbs(float a, float b)
@@ -24,12 +49,12 @@ float minAbs(float a, float b)
     return abs(a) < abs(b) ? a : b;
 }
 
-glm::vec2 Planet::deltaLonLat(glm::vec2 a, glm::vec2 b)
+vec2 Planet::deltaLonLat(vec2 a, vec2 b)
 {
     glm::vec2 minP = a.x < b.x ? a : b;
     glm::vec2 maxP = a.x < b.x ? b : a;
 
-    return glm::vec2(
+    return vec2(
         minAbs(b.x - a.x, ((maxP.x - 360) - minP.x) * (a.x < b.x ? 1 : -1)),
 
         b.y - a.y
@@ -47,3 +72,30 @@ bool Planet::rayToLonLat(const glm::vec3 &rayOrigin, const glm::vec3 &rayDirecti
     }
     else return false;
 }
+
+glm::vec3 Planet::lonLatTo3d(float lon, float lat, float altitude) const
+{
+    glm::vec3 out(0, sphere.radius + altitude, 0);
+    out = glm::rotate(out, lat * mu::DEGREES_TO_RAD, mu::Z);
+    return glm::rotate(out, -lon * mu::DEGREES_TO_RAD, mu::Y);
+}
+
+glm::vec3 Planet::calculatePointOnPlanet(glm::vec3 pointOnUnitSphere) {
+    return pointOnUnitSphere * config.radius;
+}
+
+bool Planet::cursorToLonLat(const Camera *cam, vec2 &lonLat) const
+{
+    glm::vec3 rayDir = cam->getCursorRayDirection();
+    glm::vec3 intersection;
+    if (sphere.rayIntersection(cam->position, rayDir, &intersection, NULL))
+    {
+        lonLat.x = longitude(intersection.x, intersection.z);
+        lonLat.y = latitude(intersection.y);
+        return true;
+    }
+    else return false;
+}
+
+
+

@@ -4,6 +4,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#define GLM_FORCE_RADIANS //ensure we are using radians
+
 // Standard Headers
 #include <cstdio>
 #include <cstdlib>
@@ -11,26 +13,45 @@
 
 // Local Headers
 #include "scene.hpp"
-#include "utils/window_size.hpp"
-#include "utils/input/key_input.hpp"
-#include "utils/input/mouse_input.hpp"
+#include "graphics/gl_error.hpp"
+#include "graphics/window_size.hpp"
+#include "graphics/input/key_input.hpp"
+#include "graphics/input/mouse_input.hpp"
+
+namespace Globals {
+    Scene * scene;
+}
+
+static void error_callback(int error, const char* description){ fprintf(stderr, "Error: (%d)%s\n", error, description); }
+
+// static void glfwErrorCallback(int, const char *message) {
+//   fprintf(stderr, "%s\n", message);
+// }
+
+// static void glMessageCallback(GLenum, GLenum, GLuint, GLenum, GLsizei,
+//                               const GLchar *message, const void *) {
+//   glfwErrorCallback(0, message);
+// }
 
 int main(int argc, char * argv[]) {
 
     // Load GLFW and Create a Window
+    GLFWwindow * mWindow;
+    glfwSetErrorCallback(&error_callback);
     // Initialise GLFW
+    
     if (!glfwInit())
     {
         std::cerr << "Failed to initialize GLFW" << std::endl;
         return EXIT_FAILURE;
     }
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     
-    GLFWwindow * mWindow = glfwCreateWindow(mWidth, mHeight, "OpenGL", nullptr, nullptr);
+    mWindow = glfwCreateWindow(mWidth, mHeight, "OpenGL", nullptr, nullptr);
 
     // Check for Valid Context
     if (mWindow == nullptr) {
@@ -38,29 +59,40 @@ int main(int argc, char * argv[]) {
         glfwTerminate();
         return EXIT_FAILURE;
     }
-
+    
     // Create Context and Load OpenGL Functions
     glfwMakeContextCurrent(mWindow);
+    glfwSwapInterval(1);
+
+    // glDebugMessageCallback(glMessageCallback, NULL);
+    
+    // Initialize OpenGL
     gladLoadGL();
     fprintf(stderr, "OpenGL %s\n", glGetString(GL_VERSION));
-
-    // glEnable(GL_DEBUG_OUTPUT);
-    // glDebugMessageCallback(glMessageCallback, NULL); 
-
+    
     WindowSize::setInputWindow(mWindow);
     KeyInput::setInputWindow(mWindow);
     MouseInput::setInputWindow(mWindow);
+    
+    check_gl_error();
 
-    // Initialize OpenGL
 	glEnable(GL_DEPTH_TEST);
-	glClearColor(0.01f, 0.01f, .01f, 1.0f);  
+	glClearColor(.5f, .5f, 0.5f, 1.0f);  
 
     double prev_time = glfwGetTime();
     int frame_count = 0;
     double remaining_second = 1;
 
-    Scene * scene = new Scene(); 
+    Globals::scene = new Scene();
 
+    WindowSize::resize();
+    Globals::scene->resize();
+    
+    check_gl_error();
+    // Globals::scene->upload();
+
+    check_gl_error();
+    
     // Rendering Loop
     while (glfwWindowShouldClose(mWindow) == false) {
         if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -73,6 +105,8 @@ int main(int argc, char * argv[]) {
         double delta_time = current_time - prev_time;
 
         frame_count++;
+        
+        check_gl_error();
 
         if ((remaining_second -= delta_time) <= 0)
         {
@@ -85,9 +119,10 @@ int main(int argc, char * argv[]) {
         if (WindowSize::should_resize)
         {
             WindowSize::resize();
+            Globals::scene->resize();
         }
 
-        scene->draw(delta_time);
+        Globals::scene->draw(delta_time);
         KeyInput::update();
         MouseInput::update();
 
