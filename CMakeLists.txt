@@ -16,6 +16,8 @@ option(ASSIMP_BUILD_SAMPLES OFF)
 option(ASSIMP_BUILD_TESTS OFF)
 add_subdirectory(libs/assimp)
 
+add_subdirectory(libs/FastNoiseSIMD)
+
 if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
 else()
@@ -30,6 +32,7 @@ include_directories(include/
                     libs/assimp/include/
                     libs/glad/include/
                     libs/glfw/include/
+                    libs/FastNoiseSIMD/include
                     libs/glm/
                     libs/stb/)
 
@@ -85,6 +88,14 @@ set(PROJECT_SOURCES
 	src/utils/file/file.cpp
 	src/utils/math/polygon.cpp
 	src/utils/math/FastNoise.cpp
+	# src/utils/math/FastNoiseSIMD/FastNoiseSIMD.cpp
+	# src/utils/math/FastNoiseSIMD/FastNoiseSIMD_avx2.cpp
+	# src/utils/math/FastNoiseSIMD/FastNoiseSIMD_avx512.cpp
+	# src/utils/math/FastNoiseSIMD/FastNoiseSIMD_internal.cpp
+	# src/utils/math/FastNoiseSIMD/FastNoiseSIMD_neon.cpp
+	# src/utils/math/FastNoiseSIMD/FastNoiseSIMD_sse2.cpp
+	# src/utils/math/FastNoiseSIMD/FastNoiseSIMD_sse41.cpp
+	# src/utils/math/FastNoiseSIMD/ARM/cpu-features.c
 	src/utils/resource_manager.cpp
 )
 
@@ -105,12 +116,18 @@ source_group("Headers" FILES ${PROJECT_HEADERS})
 source_group("Shaders" FILES ${PROJECT_SHADERS})
 source_group("Vendors" FILES ${VENDORS_SOURCES})
 
+# FastNoise Compile Flags
+# set_source_files_properties(src/utils/math/FastNoiseSIMD/FastNoiseSIMD_sse2.cpp PROPERTIES COMPILE_FLAGS -msse2)
+# set_source_files_properties(src/utils/math//FastNoiseSIMD/FastNoiseSIMD_sse41.cpp PROPERTIES COMPILE_FLAGS -msse4.1)
+# set_source_files_properties(src/utils/math//FastNoiseSIMD/FastNoiseSIMD_avx2.cpp PROPERTIES COMPILE_FLAGS -march=core-avx2)
+# set_source_files_properties(src/utils/math//FastNoiseSIMD/FastNoiseSIMD_avx512.cpp PROPERTIES COMPILE_FLAGS -mavx512f)
+
 add_definitions(-DGLFW_INCLUDE_NONE
                 -DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\")
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS}
                                ${PROJECT_SHADERS} ${PROJECT_CONFIGS}
                                ${VENDORS_SOURCES})
-target_link_libraries(${PROJECT_NAME} assimp glfw
+target_link_libraries(${PROJECT_NAME} assimp glfw FastNoiseSIMD
                       ${GLFW_LIBRARIES} ${GLAD_LIBRARIES})
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME})

@@ -16,13 +16,13 @@ Planet::Planet(PlanetConfig config): config(config), sphere(config.radius), name
 
 void Planet::upload()
 {
-    VertBuffer *buffer = NULL;
-    for (auto isl : land)
-    {
-        if (!buffer) buffer = VertBuffer::with(isl->terrainMesh->attributes);
-        buffer->add(isl->terrainMesh);
-    }
-    if (buffer) buffer->upload();
+    // VertBuffer *buffer = NULL;
+    // for (auto isl : land)
+    // {
+    //     if (!buffer) buffer = VertBuffer::with(isl->terrainMesh->attributes);
+    //     buffer->add(isl->terrainMesh);
+    // }
+    // if (buffer) buffer->upload();
     VertBuffer::uploadSingleMesh(mesh);
 }
 
@@ -30,8 +30,8 @@ void Planet::upload()
 // NOTE!!!!: is also called when planet generation restarts
 void Planet::destroyLandMasses()
 {
-    for (LandMass *landmass : land) delete landmass;
-    land.clear();
+    // for (LandMass *landmass : land) delete landmass;
+    // land.clear();
 }
 
 float Planet::longitude(float x, float z) const
@@ -99,38 +99,38 @@ bool Planet::cursorToLonLat(const Camera *cam, vec2 &lonLat) const
 
 void Planet::toBinary(std::vector<uint8> &out) const
 {
-    slz::add((uint8) land.size(), out);
-    for (int i = 0; i < land.size(); i++)
-        slz::add(uint32(0), out);
+    // slz::add((uint8) land.size(), out);
+    // for (int i = 0; i < land.size(); i++)
+    //     slz::add(uint32(0), out);
 
-    for (int i = 0; i < land.size(); i++)
-    {
-        uint32 beginSize = out.size();
-        land[i]->toBinary(out);
-        uint32 size = out.size() - beginSize;
+    // for (int i = 0; i < land.size(); i++)
+    // {
+    //     uint32 beginSize = out.size();
+    //     land[i]->toBinary(out);
+    //     uint32 size = out.size() - beginSize;
 
-        memcpy(&out[1 + i * 4], &size, 4);
-    }
+    //     memcpy(&out[1 + i * 4], &size, 4);
+    // }
 }
 
 void Planet::fromBinary(const std::vector<uint8> &in, unsigned int inputOffset)
 {
-    uint8 nrOfIslands = in.at(inputOffset);
+    // uint8 nrOfIslands = in.at(inputOffset);
 
-    uint32 startI = nrOfIslands * 4 + 1 + inputOffset;
-    for (int i = 0; i < nrOfIslands; i++)
-    {
-        auto size = slz::get<uint32>(in, inputOffset + 1 + i * 4);
+    // uint32 startI = nrOfIslands * 4 + 1 + inputOffset;
+    // for (int i = 0; i < nrOfIslands; i++)
+    // {
+    //     auto size = slz::get<uint32>(in, inputOffset + 1 + i * 4);
 
-        land.emplace_back(new LandMass(in, startI, this));
-        auto isl = land.back();
-        isl->planetDeform();
-        isl->placeOnPlanet();
-        isl->transformVertices();
-        isl->calculateNormals();
-        isl->createMesh();
-        startI += size;
-    }
+    //     land.emplace_back(new LandMass(in, startI, this));
+    //     auto isl = land.back();
+    //     isl->planetDeform();
+    //     isl->placeOnPlanet();
+    //     isl->transformVertices();
+    //     isl->calculateNormals();
+    //     isl->createMesh();
+    //     startI += size;
+    // }
     
     VertAttributes attrs;
     attrs.add_(VertAttributes::POSITION)

@@ -41,11 +41,12 @@ void TerrainRenderer::render() {
 
     Universe universe = Globals::scene->getUniverse();
 
-    for (auto isl : universe.getPlanet()->land)
-    {
-        if (!isl->isInView) continue;
-        isl->terrainMesh->render();
-    }
+    // Draw grids
+    // for (auto isl : universe.getPlanet()->land)
+    // {
+    //     if (!isl->isInView) continue;
+    //     isl->terrainMesh->render();
+    // }
     check_gl_error();
 }
 

@@ -6,7 +6,7 @@
 #include "graphics/input/mouse_input.hpp"
 
 Scene::Scene():
-    universe("pre-generated-level.save"), camera(.1, 1000, 1, 1, 55), flyingCamera(&camera), planetCamera(&camera, universe.getPlanet()),
+    universe(), camera(.1, 1000, 1, 1, 55), flyingCamera(&camera), planetCamera(&camera, universe.getPlanet()),
     reflectionBuffer(512, 512) {
 
     reflectionBuffer.addColorTexture(GL_RGB, GL_LINEAR, GL_LINEAR);
@@ -75,7 +75,7 @@ void Scene::draw(float dt) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     check_gl_error();
 
-    terrain_renderer.render();
+    // terrain_renderer.render();
     check_gl_error();
 
     glEnable(GL_BLEND);

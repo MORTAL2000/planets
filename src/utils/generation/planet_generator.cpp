@@ -17,19 +17,19 @@ void PlanetGenerator::generate()
 {
     std::cout << "Starting generation of " << plt->name << std::endl;
 
-    int failedTries = 0;
+    // int failedTries = 0;
 
-    while (!tryToGenerate())
-    {
-        std::cout << "Planet generation failed\n";
-        if (++failedTries > 3)
-        {
-            std::cout << "nr of Islands is too high!!!!\n\n\n";
-            minNrOfIslands--;
-            failedTries = 0;
-        }
-        plt->destroyLandMasses();
-    }
+    // while (!tryToGenerate())
+    // {
+    //     std::cout << "Planet generation failed\n";
+    //     if (++failedTries > 3)
+    //     {
+    //         std::cout << "nr of Islands is too high!!!!\n\n\n";
+    //         minNrOfIslands--;
+    //         failedTries = 0;
+    //     }
+    //     plt->destroyLandMasses();
+    // }
 
     VertAttributes attrs;
     attrs.add_(VertAttributes::POSITION)
@@ -40,7 +40,8 @@ void PlanetGenerator::generate()
     plt->mesh= plt->sphere.generate(plt->name + "_mesh", plt->config.segments, plt->config.rings, attrs);
     plt->upload();
 
-    std::cout << "Generation of " << plt->name << " done. Placed " << plt->land.size() << "/" << nrOfIslands << " islands.\n";
+    // std::cout << "Generation of " << plt->name << " done. Placed " << plt->land.size() << "/" << nrOfIslands << " islands.\n";
+    std::cout << "Generation of " << plt->name << " done.\n";
 }
 
 bool PlanetGenerator::tryToGenerate()
@@ -48,23 +49,23 @@ bool PlanetGenerator::tryToGenerate()
     int maxTries = 50;
     int failedTries = 0;
 
-    while (plt->land.size() < nrOfIslands && failedTries < maxTries)
-    {
-        auto context = islContextProvider(plt->land.size());
-        LandMass *isl = context.islandGenerator.generateEssentials();
+    // while (plt->land.size() < nrOfIslands && failedTries < maxTries)
+    // {
+    //     auto context = islContextProvider(plt->land.size());
+    //     LandMass *isl = context.islandGenerator.generateEssentials();
 
-        if (isl->percentageUnderwater() < .87 && placeOnPlanet(isl, context.minLatitude, context.maxLatitude))
-        {
-            failedTries = 0;
-            context.islandGenerator.finishGeneration();
-        }
-        else 
-        {
-            failedTries++;
-            delete isl; // so sad
-        }
-    }
-    return plt->land.size() >= minNrOfIslands;
+    //     if (isl->percentageUnderwater() < .87 && placeOnPlanet(isl, context.minLatitude, context.maxLatitude))
+    //     {
+    //         failedTries = 0;
+    //         context.islandGenerator.finishGeneration();
+    //     }
+    //     else 
+    //     {
+    //         failedTries++;
+    //         delete isl; // so sad
+    //     }
+    // }
+    // return plt->land.size() >= minNrOfIslands;
 }
 
 bool PlanetGenerator::placeOnPlanet(LandMass *isl, float minLat, float maxLat)
@@ -81,18 +82,18 @@ bool PlanetGenerator::placeOnPlanet(LandMass *isl, float minLat, float maxLat)
 
 bool PlanetGenerator::tryToPlaceOnPlanet(LandMass *isl, float lon, float lat)
 {
-    isl->longitude = lon;
-    isl->latitude = lat;
-    isl->placeOnPlanet();
+    // isl->longitude = lon;
+    // isl->latitude = lat;
+    // isl->placeOnPlanet();
 
-    if (overflowsLongitude(isl)) return false;
+    // if (overflowsLongitude(isl)) return false;
 
-    for (LandMass *isl1 : plt->land)
-        if (overlaps(isl, isl1)) return false;
+    // for (LandMass *isl1 : plt->land)
+    //     if (overlaps(isl, isl1)) return false;
 
-    isl->transformVertices();
-    plt->land.push_back(isl);
-    return true;
+    // isl->transformVertices();
+    // plt->land.push_back(isl);
+    // return true;
 }
 
 bool PlanetGenerator::overflowsLongitude(LandMass *isl)

@@ -219,7 +219,7 @@ void LandMass::calculateNormals()
 
 void LandMass::createMesh()
 {
-    std::string name = planet->name + "_LandMass_" + std::to_string(planet->land.size());
+    std::string name = planet->name + "_LandMass";// + std::to_string(planet->land.size());
     VertAttributes attrs = VertAttributes();
     unsigned int
         posOffset = attrs.add(VertAttributes::POSITION),

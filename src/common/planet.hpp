@@ -6,7 +6,6 @@
 #include <glm/vec2.hpp>
 
 // Local Headers
-#include "land_mass.hpp"
 #include "geometry/sphere.hpp"
 #include "graphics/renderable.hpp"
 #include "graphics/camera.hpp"
@@ -25,7 +24,7 @@ class Planet {
         std::string name;
         Sphere sphere;
 
-        std::vector<LandMass*> land;
+        // std::vector<LandMass*> land;
 
         SharedMesh mesh;
 

@@ -43,6 +43,9 @@ void Mesh::render() {
     if (!vertBuffer || !vertBuffer->isUploaded()) throw name + " is not uploaded. Upload it first with a VertBuffer";
     vertBuffer->bind();
     check_gl_error();
+
+    // glPolygonMode(GL_FRONT_AND_BACK, (true) ? GL_LINE : GL_FILL);
+
     // draw mesh
     glDrawElementsBaseVertex(
         GL_TRIANGLES,
@@ -59,6 +62,8 @@ void Mesh::renderInstances(GLsizei count)
 {
     if (!vertBuffer || !vertBuffer->isUploaded()) throw name + " is not uploaded. Upload it first with a VertBuffer";
     vertBuffer->bind();
+
+    // glPolygonMode(GL_FRONT_AND_BACK, (true) ? GL_LINE : GL_FILL);
    
     glDrawElementsInstancedBaseVertex(
         GL_TRIANGLES,
@@ -105,7 +110,7 @@ void Mesh::computeSmoothingNormals() {
 
 Mesh::~Mesh() {
     std::cout << "Mesh destroyed: " << name << std::endl;
-    
+
     if (vertBuffer)
         vertBuffer->onMeshDestroyed();
 }

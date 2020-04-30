@@ -31,11 +31,11 @@ void UnderwaterRenderer::render() {
 
     applyUniforms(shader);
     
-    for (auto land : universe.getPlanet()->land)
-    {
-        if (!land->isInView) continue;
-        land->terrainMesh->render();
-    }
+//    for (auto land : universe.getPlanet()->land)
+//    {
+//        if (!land->isInView) continue;
+//        land->terrainMesh->render();
+//    }
 
     // render waves to alpha channel of underwater
 

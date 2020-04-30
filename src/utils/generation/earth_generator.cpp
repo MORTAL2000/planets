@@ -1,11 +1,15 @@
 
 #include "earth_generator.h"
-#include "landmass_shape_generator.h"
+
+#include <FastNoiseSIMD/FastNoiseSIMD.h>
+
+// #include "landmass_shape_generator.h"
 #include "utils/math_utils.h"
 #include "utils/math/FastNoise.h"
 #include "utils/math/interpolation.h"
 // #include "utils/json_model_loader.h"
 #include "graphics/tangent_calculator.hpp"
+
 
 namespace
 {
@@ -72,7 +76,7 @@ void terrainFromShape(std::vector<bool> shape, LandMass *isl)
 void generateIslandTerrain(LandMass *isl)
 {
     isl->seaBottom = SEA_BOTTOM;
-    terrainFromShape(IslandShapeGenerator(isl).shape, isl);
+    // terrainFromShape(IslandShapeGenerator(isl).shape, isl);
 }
 
 void addGrass(LandMass *isl)
@@ -164,27 +168,90 @@ void islandTextureMapper(LandMass *isl)
     addRock2Texture(isl);
 }
 
+void applyNoiseToMesh(Planet *earth) {
+    FastNoiseSIMD* myNoise = FastNoiseSIMD::NewFastNoiseSIMD();
+
+    myNoise->SetFrequency(0.05f);
+    // myNoise->SetNoiseType = FastNoise::Perlin;
+
+    float radius = (int) earth->sphere.radius;
+    glm::vec3 center = earth->sphere.center;
+
+    int noiseResolution = 128;
+
+    std::cout << "Starting Perlin Noise Terrain Generator" << std::endl;
+
+    float* noiseSet = myNoise->GetPerlinFractalSet(0, 0, 0, noiseResolution, noiseResolution, noiseResolution);
+    // Get a set of 16 x 16 x 16 Simplex Fractal noise
+    // float* noiseSet = myNoise->GetSimplexFractalSet(0, 0, 0, 16, 16, 16);    
+    
+    int index = 0;
+
+    unsigned int posOffset = earth->mesh->attributes.getOffset(VertAttributes::POSITION);
+    unsigned int normOffset = earth->mesh->attributes.getOffset(VertAttributes::NORMAL);
+
+    float binSize = (noiseResolution - 1) / (2.f * radius);
+    for (unsigned int vertI = 0; vertI < earth->mesh->nrOfVertices; vertI++)
+    {
+        // int vertI = earth->mesh->indices[index];
+
+        glm::vec3 pos = earth->mesh->get<glm::vec3>(vertI, posOffset);
+//        glm::vec3 normal = earth->mesh->get<glm::vec3>(vertI, normOffset);
+        glm::vec3 normal = glm::normalize(pos - center);
+        // Binning the vertices into noise chunks
+        int i = (pos.x + radius) * binSize, 
+            j = (pos.y + radius) * binSize, 
+            k = (pos.z + radius) * binSize;
+
+        assert(i >= 0 && i <= noiseResolution);
+        assert(j >= 0 && j <= noiseResolution);
+        assert(k >= 0 && k <= noiseResolution);
+
+        float height = 40.f * noiseSet[(i * noiseResolution * noiseResolution) + (j * noiseResolution) + k];
+
+        // std::cout << "Applying height of: " << height << " for " << glm::to_string(pos) << std::endl;
+     
+        earth->mesh->set<glm::vec3>(pos + (height * normal), vertI, posOffset);
+    }
+
+    std::cout << "Finished Perlin Noise Terrain Generator" << std::endl;
+
+    FastNoiseSIMD::FreeNoiseSet(noiseSet);
+}
+
 } // namespace
 
 void generateEarth(Planet *earth)
 {
-    PlanetGenerator g(
-        earth,
+    // PlanetGenerator g(
+    //     earth,
 
-        // Island context provider:
-        [&](int islandNumber) {
-            bool h = mu::random() > .5;
-            return IslandContext{
-                IslandGenerator(
-                    mu::randomInt(100, h ? 150 : 250), mu::randomInt(100, h ? 250 : 150),
-                    earth,
-                    generateIslandTerrain,
-                    islandTextureMapper),
-                0, 180};
-        },
+    //     // Island context provider:
+    //     [&](int islandNumber) {
+    //         bool h = mu::random() > .5;
+    //         return IslandContext{
+    //             IslandGenerator(
+    //                 mu::randomInt(100, h ? 150 : 250), mu::randomInt(100, h ? 250 : 150),
+    //                 earth,
+    //                 generateIslandTerrain,
+    //                 islandTextureMapper),
+    //             0, 180};
+    //     },
 
-        // nr of islands:
-        12);
+    //     // nr of islands:
+    //     12);
 
-    g.generate();
+    // g.generate();
+
+    VertAttributes attrs;
+    attrs.add_(VertAttributes::POSITION)
+        .add_(VertAttributes::NORMAL)
+        .add_(VertAttributes::TANGENT)
+        .add_(VertAttributes::TEX_COORDS);
+
+    earth->mesh = earth->sphere.generate(earth->name + "_mesh", earth->config.segments, earth->config.rings, attrs);
+    
+    applyNoiseToMesh(earth);
+    
+    earth->upload();
 }

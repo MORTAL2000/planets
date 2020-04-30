@@ -25,16 +25,16 @@ static PlanetConfig getEarthConfig() {
 }
 
 Universe::Universe(const char *loadFilePath): earth(getEarthConfig()) {
-    if (loadFilePath)
-    {
-        auto earthBin = File::readBinary(loadFilePath);
-        earth.fromBinary(earthBin);
-    } else {
+    // if (loadFilePath)
+    // {
+    //     auto earthBin = File::readBinary(loadFilePath);
+    //     earth.fromBinary(earthBin);
+    // } else {
         generateEarth(&earth);
-        std::vector<uint8> data;
-        earth.toBinary(data);
-        File::writeBinary("level.save", data);
-    }
+    //     std::vector<uint8> data;
+    //     earth.toBinary(data);
+    //     File::writeBinary("level.save", data);
+    // }
 }
 
 void Universe::update(float dt) {
