@@ -4,10 +4,10 @@
 #include "common/planet.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/shader.hpp"
-// #include "graphics/cube_map.hpp"
+#include "graphics/cube_map.hpp"
 #include "geometry/model.hpp"
 #include "graphics/texture.hpp"
-// #include "graphics/texture_array.hpp"
+#include "graphics/texture_array.hpp"
 
 struct LensFlare
 {
@@ -22,21 +22,20 @@ class SpaceRenderer
   public:
     SpaceRenderer();
 
-    void renderBox(const glm::vec3 &sunDir, const Camera &cam, float zoom);
+    void renderBox();
 
-    // void renderSun(const glm::vec3 &sunDir, const Camera &cam, SharedTexture depth, float time, const Planet &plt);
+    void renderSun();
 
   private:
 
     static const LensFlare flares[];
 
-    // SharedTexture sunTexture;
+    SharedTexture sunTexture;
 
-    // SharedTexArray flareTextures;
+    SharedTexArray flareTextures;
 
-    // SharedMesh cube;
-    // SharedCubeMap cubeMap;
-    // ShaderProgram cubeMapShader, sunShader, flareShader;
+    SharedMesh cube;
+    SharedCubeMap cubeMap;
 
     float lensFlareAlpha = 0;
 };

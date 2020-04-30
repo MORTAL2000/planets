@@ -6,6 +6,7 @@
 // Local Headers
 #include "scene.hpp"
 #include "utils/stb_image.h"
+#include "utils/resource_manager.hpp"
 
 // https://github.com/capnramses/antons_opengl_tutorials_book/blob/master/30_skinning_part_one/main.cpp
 /*  Functions   */
@@ -23,17 +24,16 @@ Model::Model(std::string const &path, const glm::vec3 & scale, bool gamma = fals
 
 void Model::load_model(std::string const &path) {
     // read file via ASSIMP
-    const aiScene* scene = importer.ReadFile(path, aiProcessPreset_TargetRealtime_Fast |
-                                    aiProcess_Triangulate           |
-                                    aiProcess_LimitBoneWeights      |
-                                    aiProcess_FlipUVs               |          
-                                    aiProcess_GenSmoothNormals      |
-                                    aiProcess_OptimizeMeshes        |
-                                    aiProcess_OptimizeGraph         |
-                                    aiProcess_FixInfacingNormals    |
-                                    aiProcess_FindInvalidData       |
-                                    aiProcess_CalcTangentSpace      |
-                                    aiProcess_SortByPType           
+    const aiScene* scene = importer.ReadFile(path, aiProcessPreset_TargetRealtime_Fast 
+                                    // aiProcess_LimitBoneWeights      |
+                                    // aiProcess_FlipUVs               |          
+                                    // aiProcess_GenSmoothNormals      |
+                                    // aiProcess_OptimizeMeshes        |
+                                    // aiProcess_OptimizeGraph         |
+                                    // aiProcess_FixInfacingNormals    |
+                                    // aiProcess_FindInvalidData       |
+                                    // aiProcess_CalcTangentSpace      |
+                                    // aiProcess_SortByPType           
                                     // aiProcess_PreTransformVertices
     );
     // check for errors

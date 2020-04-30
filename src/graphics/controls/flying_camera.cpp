@@ -10,41 +10,41 @@
 
 
 FlyingCamera::FlyingCamera(Camera *cam)
-: cam(cam)
+: camera(cam)
 {
     MouseInput::setLockedMode(true);
 }
 
-void FlyingCamera::update(double deltaTime)
+void FlyingCamera::update(float dt)
 {
     speedMultiplier += MouseInput::yScroll * .5;
     if (speedMultiplier < 0) speedMultiplier = 0;
 
     if (KeyInput::pressed(GLFW_KEY_W))
-        cam->position += cam->direction * glm::vec3(deltaTime * speedMultiplier);
+        camera->position += camera->direction * glm::vec3(dt * speedMultiplier);
 
     if (KeyInput::pressed(GLFW_KEY_S))
-        cam->position += cam->direction * glm::vec3(-deltaTime * speedMultiplier);
+        camera->position += camera->direction * glm::vec3(-dt * speedMultiplier);
 
     if (KeyInput::pressed(GLFW_KEY_D))
-        cam->position += cam->right * glm::vec3(deltaTime * speedMultiplier);
+        camera->position += camera->right * glm::vec3(dt * speedMultiplier);
 
     if (KeyInput::pressed(GLFW_KEY_A))
-        cam->position += cam->right * glm::vec3(-deltaTime * speedMultiplier);
+        camera->position += camera->right * glm::vec3(-dt * speedMultiplier);
 
     if (KeyInput::pressed(GLFW_KEY_LEFT_SHIFT))
-        cam->position.y -= deltaTime * speedMultiplier;
+        camera->position.y -= dt * speedMultiplier;
 
     if (KeyInput::pressed(GLFW_KEY_SPACE))
-        cam->position.y += deltaTime * speedMultiplier;
+        camera->position.y += dt * speedMultiplier;
 
     if (MouseInput::deltaMouseX != 0)
-        cam->rotate(MouseInput::deltaMouseX / WindowSize::width * -100 * mouseSensivity, cam->up);
+        camera->rotate(MouseInput::deltaMouseX / WindowSize::width * -100 * mouseSensivity, camera->up);
 
     if (MouseInput::deltaMouseY != 0)
-        cam->rotate(MouseInput::deltaMouseY / WindowSize::height * -100 * mouseSensivity, cam->right);
+        camera->rotate(MouseInput::deltaMouseY / WindowSize::height * -100 * mouseSensivity, camera->right);
     
-    // std::cout << glm::to_string(cam->position) << std::endl;
-    cam->update();
+    // std::cout << glm::to_string(camera->position) << std::endl;
+    camera->update();
 }
 

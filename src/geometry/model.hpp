@@ -21,8 +21,6 @@
 // Local Headers
 #include "mesh.hpp"
 // #include "skinned_mesh.hpp"
-
-#include "utils/resource_manager.hpp"
 #include "graphics/gl_error.hpp"
 
 class Model;
@@ -40,6 +38,8 @@ public:
     // std::map<string,uint> m_BoneMapping;
     // uint m_NumBones;
     // std::vector<BoneInfo> m_BoneInfo;
+
+    std::string name;
 
     std::vector<SharedMesh> meshes;
     std::vector<Animation> animations;

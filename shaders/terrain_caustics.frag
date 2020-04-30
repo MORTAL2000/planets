@@ -22,7 +22,7 @@ void main() {
 
     // light
     float dayLight = dot(v_normal, sunDir) * .33 + .67;
-    float dist = 2.0 * near * far / (qfar + near - (2.0 * gl_FragCoord.z - 1.0) * (far - near));
+    float dist = 2.0 * near * far / (far + near - (2.0 * gl_FragCoord.z - 1.0) * (far - near));
 
     for (float t = time; t < time + .2; t += .02) {
 

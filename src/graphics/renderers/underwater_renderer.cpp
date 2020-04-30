@@ -18,6 +18,8 @@ UnderwaterRenderer::UnderwaterRenderer(): underwaterBuffer(1024, 1024) {
 }
 
 void UnderwaterRenderer::render() {
+    Universe universe = Globals::scene->getUniverse();
+
     underwaterBuffer.bind();
     glEnable(GL_BLEND);
 
@@ -28,33 +30,28 @@ void UnderwaterRenderer::render() {
     shader.enable();
 
     applyUniforms(shader);
+    
+    for (auto land : universe.getPlanet()->land)
+    {
+        if (!land->isInView) continue;
+        land->terrainMesh->render();
+    }
 
-    // for (auto isl : earth.islands)
-    // {
-    //     if (!isl->isInView) continue;
-    //     isl->terrainMesh->render();
-    // }
-
-    // render waves to alpha channel of underwaterBuffer
-    // cam.far_ = planetCamMovement.horizonDistance;
-    // cam.update();
-    // waveRenderer->render(newDeltaTime, cam.combined);
+    // render waves to alpha channel of underwater
 
     underwaterBuffer.unbind();
 }
 
 void UnderwaterRenderer::applyUniforms(Shader & shader) {
     
-    Camera camera = Globals::scene->getCamera();
+    const Camera & camera = Globals::scene->getCamera();
     Universe universe = Globals::scene->getUniverse();
-
-    glm::vec3 sunDir = universe.calculateSunDirection();
 
     // glUniformMatrix4fv(shader.uniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
     glUniform1f(shader.uniform("time"), universe.getTime());
     // glUniform2f(shader.uniform("scrSize"), WindowSize::widthPixels, WindowSize::heightPixels);
     // glUniform3f(shader.uniform("camPos"), camera.position.x, camera.position.y, camera.position.z);
-    glUniform3f(shader.uniform("sunDir"), sunDir.x, sunDir.y, sunDir.z);
+    glUniform3f(shader.uniform("sunDir"), camera.sunDir.x, camera.sunDir.y, camera.sunDir.z);
 
     glUniformMatrix4fv(shader.uniform("viewTrans"), 1, GL_FALSE, &camera.combined[0][0]);
 

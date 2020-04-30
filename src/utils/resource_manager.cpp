@@ -20,6 +20,9 @@
 // std::map<string::string, SharedModel> ResourceManager::Models;
 std::map<std::string, Shader> ResourceManager::Shaders;
 std::map<std::string, SharedTexture> ResourceManager::Textures;
+std::map<std::string, SharedTexArray> ResourceManager::TextureArrays;
+std::map<std::string, SharedCubeMap> ResourceManager::CubeMaps;
+std::map<std::string, SharedModel> ResourceManager::Models;
 
 // Created by examining https://github.com/syoyo/tinyobjloader/blob/master/examples/viewer/viewer.cc
 static bool FileExists(const char * abs_filename) {
@@ -71,6 +74,31 @@ SharedTexture ResourceManager::LoadTextureFromMemory(unsigned char *buffer, unsi
     return Textures[name];
 }
 
+SharedTexArray  ResourceManager::LoadTextureArray(const std::vector<std::string> &paths, std::string name) {
+    if (paths.size() == 0)
+        throw "TextureArray::fromDDSFiles needs at least 1 DDS file";
+
+    TextureArrays[name] = loadTextureArrayFromDDSFiles(paths);
+    
+    return TextureArrays[name];
+}
+
+SharedCubeMap  ResourceManager::LoadCubeMap(const std::vector<std::string> &paths, std::string name) {
+    if (paths.size() != 6)
+        throw "CubeMap::fromDDSFiles needs 6 DDS files";
+
+    CubeMaps[name] = loadCubeMapFromDDSFiles(paths);
+    
+    return CubeMaps[name];
+}
+
+SharedCubeMap  ResourceManager::GetCubeMap(std::string name) {
+    return CubeMaps[name];
+}
+
+SharedTexArray  ResourceManager::GetTextureArray(std::string name) {
+    return TextureArrays[name];
+}
 
 Shader ResourceManager::GetShader(std::string name)
 {
@@ -89,6 +117,21 @@ bool ResourceManager::HasTexture(std::string name)
     return it != Textures.end();
 }
 
+SharedModel ResourceManager::LoadModel(std::string file, std::string name)
+{
+    std::string directory = ASSETS_DIR;
+
+    file = directory + file;
+    Models[name] = SharedModel(new Model(file, glm::vec3(1.f), false)); 
+
+    return Models[name];
+}
+
+SharedModel ResourceManager::GetModel(std::string name)
+{
+    return Models[name];
+}
+
 void ResourceManager::Clear()
 {
     // (properly) delete all shaders	
@@ -99,10 +142,74 @@ void ResourceManager::Clear()
         glDeleteTextures(1, &iter.second->id);
 }
 
+
+// Private
+
+SharedTexArray ResourceManager::loadTextureArrayFromDDSFiles(const std::vector<std::string> &paths) {
+    std::string directory = ASSETS_DIR;
+
+    std::vector<DDSData> datas;
+    datas.reserve(paths.size());
+    for (auto &path : paths)
+        datas.emplace_back((ASSETS_DIR + path).c_str());
+
+    TextureArray * texarray = new TextureArray();
+    DDSData &d = datas[0];
+
+    GLuint width = d.width, height = d.height, layerCount = datas.size(), mipMapCount = d.mipMapCount;
+
+    texarray->Max_Level = d.mipMapCount - 1;
+    texarray->Internal_Format = d.format;
+
+    std::vector<unsigned char *> buffers;
+    for (auto &data : datas)
+    {
+        if (data.width != width || data.height != height || data.format != d.format || data.mipMapCount != mipMapCount)
+            throw "TextureArray: DDS files cannot have different dimensions/formats/mipmap-levels";
+
+        buffers.push_back(data.buffer);
+    }
+
+    texarray->generate(width, height, buffers);
+
+    return SharedTexArray(texarray);
+}
+
+
+SharedCubeMap ResourceManager::loadCubeMapFromDDSFiles(const std::vector<std::string> &paths) {
+    std::string directory = ASSETS_DIR;
+
+    std::vector<DDSData> datas;
+    datas.reserve(6);
+    for (auto &path : paths)
+        datas.emplace_back((ASSETS_DIR + path).c_str());
+
+    CubeMap * cube_map = new CubeMap();
+    DDSData &d = datas[0];
+
+    GLuint width = d.width, height = d.height;
+
+    cube_map->Internal_Format = d.format;
+
+    std::vector<unsigned char *> buffers;
+    for (auto &data : datas)
+    {
+        if (data.width != width || data.height != height || data.format != d.format)
+            throw "CubeMap: DDS files cannot have different dimensions/formats/mipmap-levels";
+
+        buffers.push_back(data.buffer);
+    }
+
+    cube_map->generate(width, height, buffers);
+
+    return SharedCubeMap(cube_map);
+}
+
 SharedTexture ResourceManager::loadTextureFromDDSFile(const char *file) {
     DDSData data(file);
 
     Texture * texture = new Texture();
+
     glBindTexture(GL_TEXTURE_2D, texture->id);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, data.mipMapCount - 1); // opengl likes array length of mipmaps
@@ -116,8 +223,7 @@ SharedTexture ResourceManager::loadTextureFromDDSFile(const char *file) {
     for (unsigned int level = 0; level < data.mipMapCount && (data.width || data.height); ++level)
     {
         unsigned int size = ((w + 3) / 4) * ((h + 3) / 4) * blockSize;
-        glCompressedTexImage2D(GL_TEXTURE_2D, level, data.format, w, h,
-                               0, size, data.buffer + offset);
+        glCompressedTexImage2D(GL_TEXTURE_2D, level, data.format, w, h, 0, size, data.buffer + offset);
         offset += size;
         w /= 2;
         h /= 2;
@@ -192,3 +298,4 @@ SharedTexture ResourceManager::loadTextureFromMemory(unsigned char *buffer, unsi
 
     return SharedTexture(texture);
 }
+

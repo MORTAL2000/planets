@@ -1,60 +1,59 @@
 
-#include "space_renderer.h"
-#include "graphics/3d/vert_buffer.h"
-#include "utils/json_model_loader.h"
+#include "space_renderer.hpp"
+#include "graphics/vert_buffer.hpp"
+// #include "utils/json_model_loader.h"
 #include "utils/math_utils.h"
-#include "gu/game_utils.h"
-#include "../planet.h"
+#include "graphics/window_size.hpp"
+// #include "gu/game_utils.h"
+#include "common/planet.hpp"
+#include "scene.hpp"
+#include "utils/resource_manager.hpp"
 
 SpaceRenderer::SpaceRenderer()
-    : cubeMapShader(ShaderProgram::fromFiles(
-        "SpaceCubeMapShader",
-        "assets/shaders/space_box.vert",
-        "assets/shaders/space_box.frag"
-    )),
-    cubeMap(CubeMap::fromDDSFiles({
-        "assets/textures/space_cubemap/right.dds",
-        "assets/textures/space_cubemap/left.dds",
-        "assets/textures/space_cubemap/top.dds",
-        "assets/textures/space_cubemap/bottom.dds",
-        "assets/textures/space_cubemap/front.dds",
-        "assets/textures/space_cubemap/back.dds",
-    })),
-    sunTexture(Texture::fromDDSFile("assets/textures/sun/sun.dds")),
-
-    flareTextures(TextureArray::fromDDSFiles({
-        "assets/textures/sun/flare1.dds",
-        "assets/textures/sun/flare0.dds",
-        "assets/textures/sun/flare3.dds",
-        "assets/textures/sun/flare4.dds",
-        "assets/textures/sun/flare5.dds"
-    })),
-    sunShader(ShaderProgram::fromFiles(
-        "SunShader",
-        "assets/shaders/sun_and_flare.vert",
-        "assets/shaders/sun.frag"
-    )),
-    flareShader(ShaderProgram::fromFiles(
-        "FlareShader",
-        "assets/shaders/sun_and_flare.vert",
-        "assets/shaders/flare.frag"
-    ))
 {
-    cube = JsonModelLoader::fromUbjsonFile("assets/models/cube.ubj", &VertAttributes().add_(VertAttributes::POSITION))[0]->parts[0].mesh;
+    sunTexture = ResourceManager::LoadTexture("textures/sun/sun.dds", "sun");
+
+    cubeMap = ResourceManager::LoadCubeMap({
+        "textures/space_cubemap/right.dds",
+        "textures/space_cubemap/left.dds",
+        "textures/space_cubemap/top.dds",
+        "textures/space_cubemap/bottom.dds",
+        "textures/space_cubemap/front.dds",
+        "textures/space_cubemap/back.dds",
+    }, "space_cubemap");
+
+    flareTextures = ResourceManager::LoadTextureArray({
+        "textures/sun/flare1.dds",
+        "textures/sun/flare0.dds",
+        "textures/sun/flare3.dds",
+        "textures/sun/flare4.dds",
+        "textures/sun/flare5.dds"
+    }, "flare_textures");
+
+    cube = ResourceManager::LoadModel("models/cube.obj", "cube")->meshes[0];
+    // , &VertAttributes().add_(VertAttributes::POSITION))[0]->parts[0].mesh;
     VertBuffer::uploadSingleMesh(cube);
+
+    Shader space_cube = ResourceManager::LoadShader("space_box.vert", "space_box.frag", "space_cube");
+    Shader sun_shader = ResourceManager::LoadShader("sun_and_flare.vert", "sun.frag", "sun_shader");
+    Shader flare_shader = ResourceManager::LoadShader("sun_and_flare.vert", "flare.frag", "flare_shader");
 }
 
-void SpaceRenderer::renderBox(const vec3 &sunDir, const Camera &cam, float zoom)
+void SpaceRenderer::renderBox()
 {
+    Camera camera = Globals::scene->getCamera();
+
     glDisable(GL_BLEND);
-    cubeMapShader.use();
+    Shader shader = ResourceManager::GetShader("space_cube");
+    shader.enable();
+
     cubeMap->bind(0);
-    glUniform1i(cubeMapShader.location("cubemap"), 0);
-    glUniform1f(cubeMapShader.location("zoomedIn"), zoom);
+    glUniform1i(shader.uniform("cubemap"), 0);
+    glUniform1f(shader.uniform("zoomedIn"), Globals::scene->planetCamera.actualZoom);
 
-    mat4 view = rotate(cam.combined, (float) -atan2(sunDir.z, sunDir.x) + mu::PI * .5f, mu::Y);
+    mat4 view = glm::rotate(camera.combined, (float) -atan2(camera.sunDir.z, camera.sunDir.x) + mu::PI * .5f, mu::Y);
 
-    glUniformMatrix4fv(cubeMapShader.location("view"), 1, GL_FALSE, &view[0][0]);
+    glUniformMatrix4fv(shader.uniform("view"), 1, GL_FALSE, &view[0][0]);
     glCullFace(GL_FRONT);
     glDepthMask(false);
     glDepthFunc(GL_LEQUAL);
@@ -103,18 +102,25 @@ const LensFlare SpaceRenderer::flares[] = {
     {0, vec4(.2, 1, .5, 1), .008, 1.81, false},
 };
 
-void SpaceRenderer::renderSun(const vec3 &sunDir, const Camera &cam, SharedTexture depth, float time, const Planet &plt)
+void SpaceRenderer::renderSun()
 {
-    sunShader.use();
-    sunTexture->bind(0, sunShader, "sun");
-    depth->bind(1, sunShader, "depthTex");
+    Camera camera = Globals::scene->getCamera();
+    Universe universe = Globals::scene->getUniverse();
+    Shader sun_shader = ResourceManager::GetShader("sun_shader");
+    sun_shader.enable();
 
-    mat4 modelT = translate(translate(mat4(1), cam.position), sunDir * vec3(5));
-    modelT = rotate(modelT, (float) -atan2(sunDir.z, sunDir.x) + mu::PI * -.5f, mu::Y);
+    sunTexture->bind(0);
+    glUniform1i(sun_shader.uniform("sun"), 0);
 
-    glUniformMatrix4fv(sunShader.location("mvp"), 1, GL_FALSE, &(cam.combined * modelT)[0][0]);
-    glUniform2f(sunShader.location("scrSize"), gu::widthPixels, gu::heightPixels);
-    glUniform1f(sunShader.location("time"), time);
+    Globals::scene->sceneBuffer->depthTexture->bind(1);
+    glUniform1i(sun_shader.uniform("depthTex"), 1);
+
+    mat4 modelT = glm::translate(glm::translate(glm::mat4(1.f), camera.position), camera.sunDir * vec3(5));
+    modelT = glm::rotate(modelT, (float) -atan2(camera.sunDir.z, camera.sunDir.x) + mu::PI * -.5f, mu::Y);
+
+    glUniformMatrix4fv(sun_shader.uniform("mvp"), 1, GL_FALSE, &(camera.combined * modelT)[0][0]);
+    glUniform2f(sun_shader.uniform("scrSize"), WindowSize::widthPixels, WindowSize::heightPixels);
+    glUniform1f(sun_shader.uniform("time"), universe.getTime());
     glDisable(GL_DEPTH_TEST);
     Mesh::getQuad()->render();
 
@@ -125,29 +131,31 @@ void SpaceRenderer::renderSun(const vec3 &sunDir, const Camera &cam, SharedTextu
 
     for (int i = 0; i < steps; i++)
     {
-        vec3 sd = rotate(sunDir, (float) (.05 * (((float) i - steps * .5) / steps)), mu::Y);
-        vec3 sunPos = cam.position + sd;
+        vec3 sd = glm::rotate(camera.sunDir, (float) (.05 * (((float) i - steps * .5) / steps)), mu::Y);
+        vec3 sunPos = camera.position + sd;
 
         bool inViewport = false;
-        cam.project(sunPos, inViewport);
+        camera.project(sunPos, inViewport);
         
-        if (!inViewport || plt.sphere.rayIntersection(cam.position, sd, NULL, NULL))
+        if (!inViewport || universe.getPlanet()->sphere.rayIntersection(camera.position, sd, NULL, NULL))
             lensFlareA -= 1.0 / steps;
 
     }
     lensFlareA = pow(lensFlareA, 2.);
     lensFlareA = lensFlareAlpha = (lensFlareA + lensFlareAlpha) * .5;
 
-    vec2 screenSunPos = cam.project(cam.position + sunDir);
+    vec2 screenSunPos = camera.project(camera.position + camera.sunDir);
 
     lensFlareA *= 1.4 - length(screenSunPos);
     lensFlareA *= .45;
-    flareShader.use();
+    
+    Shader flare_shader = ResourceManager::GetShader("flare_shader");
+    flare_shader.enable();
     glBlendFunc(GL_ONE, GL_ONE);
     flareTextures->bind(0);
-    glUniform1i(flareShader.location("textures"), 0);
+    glUniform1i(flare_shader.uniform("textures"), 0);
 
-    mat4 correctScale = scale(mat4(1), vec3(((float) gu::height / gu::width), 1, 1));
+    mat4 correctScale = scale(mat4(1), vec3(((float) WindowSize::height / WindowSize::width), 1, 1));
 
     for (auto &flare : flares)
     {
@@ -162,9 +170,9 @@ void SpaceRenderer::renderSun(const vec3 &sunDir, const Camera &cam, SharedTextu
             );
         }
 	    
-        glUniformMatrix4fv(flareShader.location("mvp"), 1, GL_FALSE, &(mvp)[0][0]);
-        glUniform1i(flareShader.location("layer"), flare.texture);
-        glUniform4f(flareShader.location("flareColor"), flare.color.r, flare.color.g, flare.color.b, flare.color.a * lensFlareA);
+        glUniformMatrix4fv(flare_shader.uniform("mvp"), 1, GL_FALSE, &(mvp)[0][0]);
+        glUniform1i(flare_shader.uniform("layer"), flare.texture);
+        glUniform4f(flare_shader.uniform("flareColor"), flare.color.r, flare.color.g, flare.color.b, flare.color.a * lensFlareA);
 
         Mesh::getQuad()->render();
     }

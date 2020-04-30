@@ -6,7 +6,7 @@
 #include "graphics/input/mouse_input.hpp"
 
 Scene::Scene():
-    camera(.1, 1000, 1, 1, 55), flyingCamera(&camera), planetCamera(&camera, universe.getPlanet()),
+    universe("pre-generated-level.save"), camera(.1, 1000, 1, 1, 55), flyingCamera(&camera), planetCamera(&camera, universe.getPlanet()),
     reflectionBuffer(512, 512) {
 
     reflectionBuffer.addColorTexture(GL_RGB, GL_LINEAR, GL_LINEAR);
@@ -37,16 +37,8 @@ Scene::Scene():
     MouseInput::setLockedMode(!camPlanetMode);
 }
 
-// void Scene::add_renderable(Renderable * renderable, Renderable * parent) {
-//     if (parent) {
-//         parent->add_child(renderable);
-//     } else {
-//         _objects.push_back(renderable);
-//     }
-// }
-
 void Scene::draw(float dt) {
-
+    check_gl_error();
     if (KeyInput::justPressed(GLFW_KEY_G))
         MouseInput::setLockedMode(false);
     else if (KeyInput::justReleased(GLFW_KEY_G) && !camPlanetMode)
@@ -58,22 +50,58 @@ void Scene::draw(float dt) {
         MouseInput::setLockedMode(!camPlanetMode);
     }
 
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    check_gl_error();
+
     if (camPlanetMode) 
-        planetCamera.update(dt, universe.getPlanet()); // planet camera movement
+        planetCamera.update(dt); // planet camera movement
     else if (!KeyInput::pressed(GLFW_KEY_G))
         flyingCamera.update(dt); // flying camera movement
 
-    // glm::vec3 sunDir = universe.calculateSunDirection();
+    camera.sunDir = universe.calculateSunDirection(planetCamera.lat, planetCamera.lon, planetCamera.actualZoom);
+   
 
+    glEnable(GL_BLEND);
+
+    // float prevCamFar = camera.z_far;
+    // camera.z_far = planetCamera.horizonDistance - 10.;
+    // cam.update();
+
+    // Render shadows
     underwater_renderer.render();
-
-    universe.update(dt);
+    check_gl_error();
 
     // sceneBuffer->bind();
-    planet_renderer.render(universe.getPlanet());
-    // sceneBuffer->unbind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    check_gl_error();
 
-    // Post Processing
+    terrain_renderer.render();
+    check_gl_error();
+
+    glEnable(GL_BLEND);
+    planet_renderer.render(universe.getPlanet());
+    check_gl_error();
+
+    // space_renderer.renderBox();
+    // atmosphere
+    // cloud_renderer.render(time, newDeltaTime, cam, sunDir, &lvl->earth);
+    glDisable(GL_BLEND);
+
+    universe.update(dt);
+    check_gl_error();
+
+    // sceneBuffer->unbind();
+    // check_gl_error();
+
+    // glEnable(GL_BLEND);
+
+    // // Post Processing
+    // post_processing.render();
+    // check_gl_error();
+
+    // space_renderer.renderSun();
+    // glEnable(GL_DEPTH_TEST);
+    // check_gl_error();
 }
 
 void Scene::resize()

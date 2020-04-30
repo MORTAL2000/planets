@@ -44,6 +44,7 @@ set(PROJECT_SOURCES
     src/main.cpp
     src/scene.cpp
     src/common/planet.cpp
+    src/common/land_mass.cpp
     src/common/universe.cpp
     src/entities/entity.cpp
     src/entities/space_craft.cpp
@@ -51,11 +52,12 @@ set(PROJECT_SOURCES
     src/geometry/model.cpp
     # src/geometry/skinned_mesh.cpp
     src/geometry/sphere.cpp
-    src/geometry/terrain_face.cpp
 	src/graphics/gl_error.cpp
 	src/graphics/window_size.cpp
 	src/graphics/shader.cpp
 	src/graphics/texture.cpp
+	src/graphics/texture_array.cpp
+	src/graphics/cube_map.cpp
 	src/graphics/frame_buffer.cpp
 	src/graphics/camera.cpp
 	src/graphics/tangent_calculator.cpp
@@ -66,12 +68,23 @@ set(PROJECT_SOURCES
 	src/graphics/renderers/lines.cpp
 	src/graphics/renderers/phong.cpp
 	src/graphics/renderers/planet_renderer.cpp
+	src/graphics/renderers/terrain_renderer.cpp
+	src/graphics/renderers/space_renderer.cpp
 	src/graphics/renderers/underwater_renderer.cpp
+	src/graphics/renderers/cloud_renderer.cpp
+	src/graphics/renderers/post_processing.cpp
     src/graphics/renderable.cpp
     src/graphics/vert_attributes.cpp
 	src/graphics/vert_buffer.cpp
 	src/utils/generation/planet_generator.cpp
+	src/utils/generation/earth_generator.cpp
+	src/utils/generation/landmass_generator.cpp
+	src/utils/generation/landmass_outliner.cpp
+	src/utils/generation/landmass_shape_generator.cpp
 	src/utils/obb.cpp
+	src/utils/file/file.cpp
+	src/utils/math/polygon.cpp
+	src/utils/math/FastNoise.cpp
 	src/utils/resource_manager.cpp
 )
 

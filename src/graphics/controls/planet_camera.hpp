@@ -13,7 +13,8 @@ class PlanetCamera
 
     PlanetCamera(Camera *cam, Planet *plt);
 
-    void update(double deltaTime, Planet *plt);
+
+    void update(float dt);
 
     float zoomVelocity = 0;
     float lon = 160, lat = 75, zoom = 0, actualZoom = 0;
@@ -26,9 +27,10 @@ class PlanetCamera
     void planetCulling();
 
     void updateHorizonDistance();
+    bool cursorToLonLat(const glm::vec3 & rayDir, vec2 &lonLat, float offset) const;
 
-    Camera *cam;
-    Planet *plt; // slightlySmallerPlt is just a dummy planet with a smaller radius used in dragUpdate()
+    Planet *plt;
+    Camera *camera;
 
     float dragLon = 0, dragLat = 0, dragUpdateAccumulator = 0, afterDragTimer;
     bool accurateDraggingStarted = false;

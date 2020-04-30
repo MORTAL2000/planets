@@ -37,6 +37,8 @@ typedef std::shared_ptr<Mesh> SharedMesh;
 
 class Mesh : public VertData {
     public:
+        static SharedMesh getQuad();
+
         std::string name;
         std::vector<unsigned short> indices;
 
@@ -55,4 +57,6 @@ class Mesh : public VertData {
 
         void render();
         void renderInstances(GLsizei count);
+    private:
+        static SharedMesh quad;
 };

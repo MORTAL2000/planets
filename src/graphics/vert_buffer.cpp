@@ -119,21 +119,45 @@ void VertBuffer::setAttrPointersAndEnable(VertAttributes &attrs, unsigned int di
     {
         auto &attr = attrs.get(i - locationOffset);
         glDisableVertexAttribArray(i);
+        switch (attr.type)
+        {
+            case GL_INT:
+            case GL_UNSIGNED_INT:
+            case GL_SHORT:
+            case GL_UNSIGNED_SHORT:
+            case GL_BYTE:
+            case GL_UNSIGNED_BYTE:
 
-        glVertexAttribPointer(
-            i,                                    // location of attribute that can be used in vertex shaders. eg: 'layout(location = 0) in vec3 position'
-            attr.size,                            // size.
-            GL_FLOAT,                             // type
-            attr.normalized ? GL_TRUE : GL_FALSE, // normalized?
-            attrs.getVertSize() * sizeof(GLfloat),// stride
-            (void *)(uintptr_t)offset             // offset
-        );
+                glVertexAttribIPointer(
+                        i,                                    // location of attribute that can be used in vertex shaders. eg: 'layout(location = 0) in vec3 position'
+                        attr.size,                            // size.
+                        attr.type,                             // type
+                        attrs.getVertSize(),                  // stride
+                        (void *)(uintptr_t)offset             // offset
+                );
+                break;
+            default:
+                glVertexAttribPointer(
+                        i,                                    // location of attribute that can be used in vertex shaders. eg: 'layout(location = 0) in vec3 position'
+                        attr.size,                            // size.
+                        attr.type,                             // type
+                        attr.normalized ? GL_TRUE : GL_FALSE, // normalized?
+                        attrs.getVertSize(),                  // stride
+                        (void *)(uintptr_t)offset             // offset
+                );
+        }
         glEnableVertexAttribArray(i);
-        offset += attr.size * sizeof(GLfloat);
+        offset += attr.byteSize;
 
         if (divisor)
         {
+            #ifdef EMSCRIPTEN
+            EM_ASM({
+                gl.vertexAttribDivisor($0, $1);
+            }, i, divisor);
+            #else
             glVertexAttribDivisor(i, divisor);
+            #endif
         }
     }
 }

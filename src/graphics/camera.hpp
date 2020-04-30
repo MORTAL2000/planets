@@ -16,6 +16,7 @@
 //         Z = glm::vec3(0, 0, 1),
 //         ZERO_3 = glm::vec3(0);
 // }
+class CameraController;
 
 class Camera {
     public:
@@ -24,6 +25,8 @@ class Camera {
         glm::vec3 position, direction, up, right;
         glm::mat4 projection, view, combined;
         float z_near, z_far, viewportWidth, viewportHeight, fov;
+
+        glm::vec3 sunDir;
 
         void update();
     
@@ -34,4 +37,11 @@ class Camera {
         void lookAt(glm::vec3 target, glm::vec3 localYAxis);
         
         void rotate(float degrees, glm::vec3 axis);
+
+            /**
+     * returns the point in 'normalized device space'.
+     * IF inViewport is originally set to false then inViewport will be set to true if the point is inside the viewport.
+     */
+    vec3 project(const vec3 &p, bool &inViewport) const;
+    vec3 project(const vec3 &p) const;
 };

@@ -29,13 +29,12 @@ void PlanetRenderer::applyUniforms(Shader & shader) {
     Universe universe = Globals::scene->getUniverse();
 
     glm::mat4 mvp = camera.combined;
-    glm::vec3 sunDir = universe.calculateSunDirection();
 
     glUniformMatrix4fv(shader.uniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
     glUniform1f(shader.uniform("time"), universe.getTime());
     glUniform2f(shader.uniform("scrSize"), WindowSize::widthPixels, WindowSize::heightPixels);
     glUniform3f(shader.uniform("camPos"), camera.position.x, camera.position.y, camera.position.z);
-    glUniform3f(shader.uniform("sunDir"), sunDir.x, sunDir.y, sunDir.z);
+    glUniform3f(shader.uniform("sunDir"), camera.sunDir.x, camera.sunDir.y, camera.sunDir.z);
 
     // Bind Textures
     foamTexture->bind(0);

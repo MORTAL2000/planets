@@ -6,8 +6,8 @@
 #include <glm/vec2.hpp>
 
 // Local Headers
+#include "land_mass.hpp"
 #include "geometry/sphere.hpp"
-#include "geometry/terrain_face.hpp"
 #include "graphics/renderable.hpp"
 #include "graphics/camera.hpp"
 
@@ -24,13 +24,15 @@ class Planet {
     public:
         std::string name;
         Sphere sphere;
+
+        std::vector<LandMass*> land;
+
         SharedMesh mesh;
 
         Planet(PlanetConfig config);
         PlanetConfig config;
 
         void upload();
-        void render();
         glm::vec3 calculatePointOnPlanet(glm::vec3 pointOnUnitSphere);
 
         // Planet Math
@@ -42,5 +44,10 @@ class Planet {
         bool rayToLonLat(const glm::vec3 &rayOrigin, const glm::vec3 &rayDirection, glm::vec2 &lonLat) const;
         bool cursorToLonLat(const Camera *cam, glm::vec2 &lonLat) const;
 
-        void uploadMeshes();
+        void toBinary(std::vector<uint8> &out) const;
+
+        void fromBinary(const std::vector<uint8> &in, unsigned int inputOffset = 0);
+
+
+        void destroyLandMasses();
 };

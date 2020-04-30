@@ -55,7 +55,7 @@ int main(int argc, char * argv[]) {
 
     // Check for Valid Context
     if (mWindow == nullptr) {
-        fprintf(stderr, "Failed to Create OpenGL Context");
+        std::cerr << "Failed to Create OpenGL Context" << std::endl;
         glfwTerminate();
         return EXIT_FAILURE;
     }
@@ -67,8 +67,11 @@ int main(int argc, char * argv[]) {
     // glDebugMessageCallback(glMessageCallback, NULL);
     
     // Initialize OpenGL
-    gladLoadGL();
-    fprintf(stderr, "OpenGL %s\n", glGetString(GL_VERSION));
+    if (!gladLoadGL()) {
+        std::cerr << "Failed to initialize OpenGL context" << std::endl;
+        return EXIT_FAILURE;
+    }
+    std::cout << "OpenGL " << glGetString(GL_VERSION) << std::endl;
     
     WindowSize::setInputWindow(mWindow);
     KeyInput::setInputWindow(mWindow);
@@ -76,21 +79,15 @@ int main(int argc, char * argv[]) {
     
     check_gl_error();
 
-	glEnable(GL_DEPTH_TEST);
-	glClearColor(.5f, .5f, 0.5f, 1.0f);  
-
     double prev_time = glfwGetTime();
     int frame_count = 0;
     double remaining_second = 1;
 
     Globals::scene = new Scene();
+    check_gl_error();
 
     WindowSize::resize();
     Globals::scene->resize();
-    
-    check_gl_error();
-    // Globals::scene->upload();
-
     check_gl_error();
     
     // Rendering Loop
@@ -99,7 +96,7 @@ int main(int argc, char * argv[]) {
             glfwSetWindowShouldClose(mWindow, true);
 
         // Clear screen
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         double current_time = glfwGetTime();
         double delta_time = current_time - prev_time;
@@ -122,7 +119,9 @@ int main(int argc, char * argv[]) {
             Globals::scene->resize();
         }
 
-        Globals::scene->draw(delta_time);
+        Globals::scene->draw(min(delta_time, .1));
+        check_gl_error();
+
         KeyInput::update();
         MouseInput::update();
 

@@ -9,12 +9,12 @@ class FlyingCamera
 
   public:
 
-    Camera *cam;
+    Camera *camera;
 
     float speedMultiplier = 1, mouseSensivity = 1;
 
     FlyingCamera(Camera *cam);
 
-    void update(double deltaTime);
+    void update(float dt);
 
 };

@@ -58,6 +58,22 @@ glm::vec3 Camera::getCursorRayDirection() const
     return getRayDirection(MouseInput::mouseX, MouseInput::mouseY);
 }
 
+vec3 Camera::project(const vec3 &p, bool &inViewport) const
+{
+    vec4 homogeneous = combined * vec4(p, 1);
+    vec3 h3 = homogeneous / homogeneous.w;
+    if (!inViewport && homogeneous.z >= 0 && all(lessThanEqual(h3, vec3(1))) && all(greaterThanEqual(h3, vec3(-1))))
+        inViewport = true;
+    return h3;
+}
+
+bool blah = true;
+
+vec3 Camera::project(const vec3 &p) const
+{
+    return project(p, blah);
+}
+
 void Camera::update()
 {
     projection = glm::perspective(glm::radians(fov), viewportWidth / viewportHeight, z_near, z_far);

@@ -5,12 +5,28 @@
 // Local Headers
 #include "graphics/vert_buffer.hpp"
 
-// Mesh::Mesh(std::string name, unsigned int nrOfVertices, unsigned int nrOfIndices, VertAttributes attributes)
-//     : name(name), VertData(attributes, std::vector<float>(nrOfVertices * attributes.getVertSize()), std::vector<unsigned short>(nrOfIndices))
-// {
-//     std::cout << "Mesh created: " << name << std::endl;
-//     vertBuffer = new VertBuffer(attributes, this);
-// }
+SharedMesh Mesh::quad;
+
+SharedMesh Mesh::getQuad()
+{
+    if (!quad)
+    {
+        quad = SharedMesh(new Mesh("quad", 4, 6, VertAttributes().add_(VertAttributes::POSITION)));
+        quad->set<float[12]>({
+                -1, -1, 0,
+                -1, 1, 0,
+                1, 1, 0,
+                1, -1, 0,
+            }, 0, 0);
+        quad->indices.insert(quad->indices.begin(), {
+            2, 1, 0,
+            0, 3, 2,
+        });
+        VertBuffer::uploadSingleMesh(quad);
+    }
+    return quad;
+}
+
 
 Mesh::Mesh(const std::string& name, unsigned int nrOfVertices, unsigned int nrOfIndices, VertAttributes attributes)
 
@@ -26,12 +42,31 @@ Mesh::Mesh(const std::string& name, unsigned int nrOfVertices, unsigned int nrOf
 void Mesh::render() {
     if (!vertBuffer || !vertBuffer->isUploaded()) throw name + " is not uploaded. Upload it first with a VertBuffer";
     vertBuffer->bind();
+    check_gl_error();
     // draw mesh
-    glDrawElements(
+    glDrawElementsBaseVertex(
         GL_TRIANGLES,
-        indices.size(),
+        nrOfIndices,
         GL_UNSIGNED_SHORT,
-        0
+        (void *)(uintptr_t)indicesBufferOffset,
+        baseVertex
+    );
+    check_gl_error();
+}
+
+
+void Mesh::renderInstances(GLsizei count)
+{
+    if (!vertBuffer || !vertBuffer->isUploaded()) throw name + " is not uploaded. Upload it first with a VertBuffer";
+    vertBuffer->bind();
+   
+    glDrawElementsInstancedBaseVertex(
+        GL_TRIANGLES,
+        nrOfIndices,
+        GL_UNSIGNED_SHORT,
+        (void *)(uintptr_t)indicesBufferOffset,
+        count,
+        baseVertex
     );
 }
 
@@ -69,6 +104,8 @@ void Mesh::computeSmoothingNormals() {
 }
 
 Mesh::~Mesh() {
+    std::cout << "Mesh destroyed: " << name << std::endl;
+    
     if (vertBuffer)
         vertBuffer->onMeshDestroyed();
 }
