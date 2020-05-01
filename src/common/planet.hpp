@@ -12,9 +12,16 @@
 
 struct PlanetConfig {
     std::string name;
+
     float radius;
-    int segments;
-    int rings;
+    glm::vec3 center = glm::vec3(0.f);
+    
+    // Mesh
+    int subdivision = 5; 
+
+    // Noise
+    float roughness = 1;
+    float strength = 1;
 };
 
 class Planet {
@@ -22,10 +29,9 @@ class Planet {
         // TerrainFace * faces[6];
     public:
         std::string name;
-        Sphere sphere;
+        // Sphere sphere;
 
-        // std::vector<LandMass*> land;
-
+        
         SharedMesh mesh;
 
         Planet(PlanetConfig config);
@@ -41,8 +47,7 @@ class Planet {
         glm::vec3 lonLatTo3d(float lon, float lat, float altitude) const;
 
         bool rayToLonLat(const glm::vec3 &rayOrigin, const glm::vec3 &rayDirection, glm::vec2 &lonLat) const;
-        bool cursorToLonLat(const Camera *cam, glm::vec2 &lonLat) const;
-
+        
         void toBinary(std::vector<uint8> &out) const;
 
         void fromBinary(const std::vector<uint8> &in, unsigned int inputOffset = 0);

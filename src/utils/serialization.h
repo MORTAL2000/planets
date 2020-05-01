@@ -117,7 +117,7 @@ class Float
     template <class vecType>
     static void serializeVecs(const vecType *v, unsigned int n, std::vector<unsigned char> &out)
     {
-        for (int i = 0; i < n; i++)
+        for (unsigned int i = 0; i < n; i++)
             serializeVec(v[i], out);
     }
 
@@ -126,7 +126,7 @@ class Float
     {
         unsigned int offset = vecType::length() * size;
         out.resize(n + outOffset);
-        for (int i = 0; i < n; i++)
+        for (unsigned int i = 0; i < n; i++)
             deserializeVec(in + i * offset, &out[outOffset + i]);
     }
 

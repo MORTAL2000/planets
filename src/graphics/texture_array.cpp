@@ -25,20 +25,26 @@
 // }
 
 
-TextureArray::TextureArray()
-    : width(0), height(0), layers(0), Max_Level(1000)
+TextureArray::TextureArray(): 
+    width(0), 
+    height(0), 
+    layers(0), 
+    Max_Level(1000),
+    Image_Format(GL_RGB),
+    Internal_Format(GL_RGB), 
+    Texture_Type(GL_UNSIGNED_BYTE)
 {
     glGenTextures(1, &this->id);
     std::cout << "TextureArray id: " << id << " created\n";
 }
 
-void TextureArray::generate(unsigned int width, unsigned int height, std::vector<unsigned char*> buffers)
+void TextureArray::generate(unsigned int width, unsigned int height, unsigned int layers, unsigned char* data)
 {
     this->width = width;
     this->height = height;
-    this->layers = buffers.size();
+    this->layers = layers;
 
-    std::cout << "Generating TextureArray width: " << width << " height: " << height << " layers: " << layers << " Max_Level: " << Max_Level << "\n";
+    std::cout << "Generating TextureArray width: " << width << " height: " << height << " layers: " << layers << "\n";
 
     check_gl_error();
 
@@ -47,7 +53,6 @@ void TextureArray::generate(unsigned int width, unsigned int height, std::vector
 
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, Max_Level); // opengl likes array length of mipmaps
-    check_gl_error();
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // don't forget to enable mipmaping
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -55,25 +60,37 @@ void TextureArray::generate(unsigned int width, unsigned int height, std::vector
     
     check_gl_error();
 
-    GLuint blockSize = (Internal_Format == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT) ? 8 : 16;
+    glTexImage3D(GL_TEXTURE_2D_ARRAY,
+            0,                     // mipmap level
+            this->Internal_Format, // gpu texel format
+            width,                 // width
+            height,                // height
+            layers,                // depth
+            0,                     // border
+            this->Image_Format,    // cpu pixel format
+            this->Texture_Type,    // cpu pixel coord type
+            data);                 // pixel data
+    glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
 
-    GLuint offset = 0, w = width, h = height;
-    for (int mipMapLevel = 0; mipMapLevel < Max_Level; mipMapLevel++)
-    {
-        GLuint size = ((w + 3) / 4) * ((h + 3) / 4) * blockSize;
-        glCompressedTexImage3D(GL_TEXTURE_2D_ARRAY, mipMapLevel, Internal_Format, w, h, layers, 0, size * layers, 0);
+    // GLuint blockSize = (Internal_Format == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT) ? 8 : 16;
+
+    // GLuint offset = 0, w = width, h = height;
+    // for (int mipMapLevel = 0; mipMapLevel < Max_Level; mipMapLevel++)
+    // {
+    //     GLuint size = ((w + 3) / 4) * ((h + 3) / 4) * blockSize;
+    //     glCompressedTexImage3D(GL_TEXTURE_2D_ARRAY, mipMapLevel, Internal_Format, w, h, layers, 0, size * layers, 0);
         
-        int i = 0;
-        for (auto &buffer : buffers)
-        {
-            glCompressedTexSubImage3D(GL_TEXTURE_2D_ARRAY, mipMapLevel, 0, 0, i, w, h, 1, Internal_Format, size, buffer + offset);
+    //     int i = 0;
+    //     for (auto &buffer : buffers)
+    //     {
+    //         glCompressedTexSubImage3D(GL_TEXTURE_2D_ARRAY, mipMapLevel, 0, 0, i, w, h, 1, Internal_Format, size, buffer + offset);
 
-            i++;
-        }
-        offset += size;
-        w /= 2;
-        h /= 2;
-    }
+    //         i++;
+    //     }
+    //     offset += size;
+    //     w /= 2;
+    //     h /= 2;
+    // }
 
     // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
     // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, data.mipMapCount - 1); // opengl likes array length of mipmaps

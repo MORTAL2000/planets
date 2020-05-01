@@ -3,7 +3,6 @@
 #define EARTH_GENERATOR_H
 
 #include "common/planet.hpp"
-#include "planet_generator.h"
 
 SharedMesh earthMeshGenerator(Planet *earth);
 

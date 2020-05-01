@@ -76,7 +76,7 @@ void PlanetCamera::update(float dt)
 
     camera->lookAt(mu::ZERO_3, -mu::Z);
 
-    glm::vec3 translateCam = glm::vec3(0, plt->sphere.radius, 0);
+    glm::vec3 translateCam = glm::vec3(0, plt->config.radius, 0);
 
     glm::mat4 transform(1);
     transform = glm::rotate(transform, glm::radians(lon), mu::Y);
@@ -149,7 +149,7 @@ glm::vec2 PlanetCamera::dragVelocity() const
 
 void PlanetCamera::updateHorizonDistance()
 {
-    horizonDistance = sqrt(pow(length(camera->position), 2) - pow(plt->sphere.radius, 2));
+    horizonDistance = sqrt(pow(length(camera->position), 2) - pow(plt->config.radius, 2));
 }
 
 
@@ -182,9 +182,9 @@ void PlanetCamera::planetCulling()
 bool PlanetCamera::cursorToLonLat(const glm::vec3 & rayDir, vec2 &lonLat, float offset) const
 {
     glm::vec3 intersection, normal;
-    if (glm::intersectRaySphere(camera->position, rayDir, plt->sphere.center, plt->sphere.radius - offset, intersection, normal)) {
+    if (glm::intersectRaySphere(camera->position, rayDir, glm::vec3(0.f), plt->config.radius - offset, intersection, normal)) {
         lonLat.x = glm::degrees(std::atan2(intersection.z, intersection.x) + 180.0f);
-        lonLat.y = glm::degrees(glm::acos((intersection.y) / plt->sphere.radius));
+        lonLat.y = glm::degrees(glm::acos((intersection.y) / plt->config.radius));
         return true;
     } 
     else return false;

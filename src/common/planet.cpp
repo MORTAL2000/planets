@@ -3,6 +3,7 @@
 // Standard Headers
 #include <math.h>
 #include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtx/intersect.hpp>
 
 // Local Headers
 #include "graphics/vert_buffer.hpp"
@@ -10,7 +11,7 @@
 #include "utils/serialization.h"
 
 
-Planet::Planet(PlanetConfig config): config(config), sphere(config.radius), name(config.name) {
+Planet::Planet(PlanetConfig config): name(config.name), config(config) {
     std::cout << "Planet " << name << " created\n";
 } 
 
@@ -41,7 +42,7 @@ float Planet::longitude(float x, float z) const
 
 float Planet::latitude(float y) const
 {
-    return mu::RAD_TO_DEGREES * glm::acos((y) / sphere.radius);
+    return mu::RAD_TO_DEGREES * glm::acos((y) / config.radius);
 }
 
 float minAbs(float a, float b)
@@ -63,8 +64,8 @@ vec2 Planet::deltaLonLat(vec2 a, vec2 b)
 
 bool Planet::rayToLonLat(const glm::vec3 &rayOrigin, const glm::vec3 &rayDirection, glm::vec2 &lonLat) const
 {
-    glm::vec3 intersection;
-    if (sphere.rayIntersection(rayOrigin, rayDirection, &intersection, NULL))
+    glm::vec3 intersection, normal;
+    if (glm::intersectRaySphere(rayOrigin, rayDirection, glm::vec3(0.f), config.radius, intersection, normal))
     {
         lonLat.x = longitude(intersection.x, intersection.z);
         lonLat.y = latitude(intersection.y);
@@ -75,7 +76,7 @@ bool Planet::rayToLonLat(const glm::vec3 &rayOrigin, const glm::vec3 &rayDirecti
 
 glm::vec3 Planet::lonLatTo3d(float lon, float lat, float altitude) const
 {
-    glm::vec3 out(0, sphere.radius + altitude, 0);
+    glm::vec3 out(0, config.radius + altitude, 0);
     out = glm::rotate(out, lat * mu::DEGREES_TO_RAD, mu::Z);
     return glm::rotate(out, -lon * mu::DEGREES_TO_RAD, mu::Y);
 }
@@ -84,18 +85,15 @@ glm::vec3 Planet::calculatePointOnPlanet(glm::vec3 pointOnUnitSphere) {
     return pointOnUnitSphere * config.radius;
 }
 
-bool Planet::cursorToLonLat(const Camera *cam, vec2 &lonLat) const
-{
-    glm::vec3 rayDir = cam->getCursorRayDirection();
-    glm::vec3 intersection;
-    if (sphere.rayIntersection(cam->position, rayDir, &intersection, NULL))
-    {
-        lonLat.x = longitude(intersection.x, intersection.z);
-        lonLat.y = latitude(intersection.y);
-        return true;
-    }
-    else return false;
-}
+// void Planet::createMesh() {
+//     Cubesphere sphere(config.radius, 3, false);
+
+//     VertAttributes attrs;
+//     attrs.add_(VertAttributes::POSITION)
+//         .add_(VertAttributes::NORMAL)
+//         .add_(VertAttributes::TANGENT)
+//         .add_(VertAttributes::TEX_COORDS);
+// }
 
 void Planet::toBinary(std::vector<uint8> &out) const
 {
@@ -138,7 +136,8 @@ void Planet::fromBinary(const std::vector<uint8> &in, unsigned int inputOffset)
         .add_(VertAttributes::TANGENT)
         .add_(VertAttributes::TEX_COORDS);
 
-    mesh = sphere.generate(name + "_mesh", config.segments, config.rings, attrs);
+    // mesh = sphere.generate(name + "_mesh", config.segments, config.rings, attrs);
+//    createMesh();
     upload();
     std::cout << "planet loaded from binary\n";
 }

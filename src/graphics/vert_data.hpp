@@ -46,7 +46,7 @@ class VertData
     template <class vecType>
     void normalizeVecAttribute(int attrOffset)
     {
-        for (int vertI = 0; vertI < vertices.size() / attributes.getVertSize(); vertI++)
+        for (unsigned int vertI = 0; vertI < ((unsigned int) vertices.size()) / attributes.getVertSize(); vertI++)
             set(normalize(get<vecType>(vertI, attrOffset)), vertI, attrOffset);
     }
 

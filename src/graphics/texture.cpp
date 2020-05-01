@@ -8,7 +8,16 @@
 
 
 Texture::Texture()
-    : width(0), height(0), Texture_Type(GL_UNSIGNED_BYTE), Internal_Format(GL_RGB), Max_Level(1000), Image_Format(GL_RGB), Wrap_S(GL_REPEAT), Wrap_T(GL_REPEAT), Filter_Min(GL_LINEAR_MIPMAP_LINEAR), Filter_Max(GL_LINEAR)
+    : width(0), 
+    height(0), 
+    Texture_Type(GL_UNSIGNED_BYTE), 
+    Internal_Format(GL_RGB), 
+    Max_Level(1000), 
+    Image_Format(GL_RGB), 
+    Wrap_S(GL_REPEAT), 
+    Wrap_T(GL_REPEAT), 
+    Filter_Min(GL_LINEAR_MIPMAP_LINEAR), 
+    Filter_Max(GL_LINEAR)
 {
     glGenTextures(1, &this->id);
     std::cout << "Texture id: " << id << " created\n";

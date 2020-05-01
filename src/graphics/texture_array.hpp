@@ -18,12 +18,14 @@ class TextureArray
     GLuint id;
     unsigned int width, height, layers;
 
+    unsigned int Texture_Type; // format of texture object
+    unsigned int Image_Format; // format of texture object
     unsigned int Internal_Format; // format of texture object
     unsigned int Max_Level; // Highest defined mipmap level
 
     TextureArray();
     ~TextureArray();
 
-    void generate(unsigned int width, unsigned int height, std::vector<unsigned char*> buffers);
+    void generate(unsigned int width, unsigned int height, unsigned int layers, unsigned char* data);
     void bind(GLuint unit);
 };

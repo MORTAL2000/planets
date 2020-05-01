@@ -137,8 +137,8 @@ void SpaceRenderer::renderSun()
         bool inViewport = false;
         camera.project(sunPos, inViewport);
         
-        if (!inViewport || universe.getPlanet()->sphere.rayIntersection(camera.position, sd, NULL, NULL))
-            lensFlareA -= 1.0 / steps;
+//        if (!inViewport || universe.getPlanet()->rayIntersection(camera.position, sd, NULL, NULL))
+//            lensFlareA -= 1.0 / steps;
 
     }
     lensFlareA = pow(lensFlareA, 2.);

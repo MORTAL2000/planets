@@ -68,18 +68,18 @@ void Scene::draw(float dt) {
     // cam.update();
 
     // Render shadows
-    underwater_renderer.render();
+    // underwater_renderer.render();
     check_gl_error();
 
     // sceneBuffer->bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     check_gl_error();
 
-    // terrain_renderer.render();
+    terrain_renderer.render();
     check_gl_error();
 
     glEnable(GL_BLEND);
-    planet_renderer.render(universe.getPlanet());
+    // water_renderer.render();
     check_gl_error();
 
     // space_renderer.renderBox();

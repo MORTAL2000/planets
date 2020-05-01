@@ -170,7 +170,7 @@ SharedTexArray ResourceManager::loadTextureArrayFromDDSFiles(const std::vector<s
         buffers.push_back(data.buffer);
     }
 
-    texarray->generate(width, height, buffers);
+    // texarray->generate(width, height, buffers);
 
     return SharedTexArray(texarray);
 }

@@ -75,7 +75,7 @@ void CloudRenderer::render(double dt)
 
         mat4 t = rotate(mat4(1.), cloud.lon * mu::DEGREES_TO_RAD, mu::Y);
         t = rotate(t, cloud.lat * mu::DEGREES_TO_RAD, mu::X);
-        t = translate(t, vec3(0, planet->sphere.radius + 35, 0));
+        t = translate(t, vec3(0, planet->config.radius + 35, 0));
 
         vec3 up = camera.up, right = camera.right;
         up = inverse(t) * vec4(up, 0);
