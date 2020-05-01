@@ -21,7 +21,6 @@ struct PlanetConfig {
 
     // Noise
     float roughness = 1;
-    float strength = 1;
 };
 
 class Planet {

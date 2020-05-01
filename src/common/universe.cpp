@@ -8,8 +8,7 @@
 #include "utils/math_utils.h"
 #include "utils/file/file.h"
 
-// #include "utils/generation/planet_generator.hpp"
-#include "utils/generation/earth_generator.h"
+#include "utils/generation/planet_generator.hpp"
 
 const float EARTH_RADIUS = 150, ATMOSPHERE_RADIUS = 198;
 
@@ -18,8 +17,6 @@ static PlanetConfig getEarthConfig() {
     config.name = "Earth";
     config.radius = EARTH_RADIUS;
     // config.color = glm::vec3(0.f, 0.f, 1.f);
-    config.segments = 100;
-    config.rings = 70;
 
     return config;
 }
@@ -30,11 +27,13 @@ Universe::Universe(const char *loadFilePath): earth(getEarthConfig()) {
     //     auto earthBin = File::readBinary(loadFilePath);
     //     earth.fromBinary(earthBin);
     // } else {
-        generateEarth(&earth);
+        // generateEarth(&earth);
     //     std::vector<uint8> data;
     //     earth.toBinary(data);
     //     File::writeBinary("level.save", data);
     // }
+
+    generator.generate(&earth);
 }
 
 void Universe::update(float dt) {

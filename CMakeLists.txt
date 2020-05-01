@@ -18,6 +18,7 @@ add_subdirectory(libs/assimp)
 
 add_subdirectory(libs/FastNoiseSIMD)
 
+
 if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
 else()
@@ -34,6 +35,7 @@ include_directories(include/
                     libs/glfw/include/
                     libs/FastNoiseSIMD/include
                     libs/glm/
+                    libs/imgui/
                     libs/stb/)
 
 file(GLOB VENDORS_SOURCES libs/glad/src/glad.c)
@@ -78,8 +80,8 @@ set(PROJECT_SOURCES
 	src/graphics/renderers/post_processing.cpp
     src/graphics/renderable.cpp
     src/graphics/vert_attributes.cpp
-	src/graphics/vert_buffer.cpp
-	src/utils/generation/earth_generator.cpp
+    src/graphics/vert_buffer.cpp
+	src/utils/generation/planet_generator.cpp
 	src/utils/obb.cpp
 	src/utils/file/file.cpp
 	src/utils/math/polygon.cpp
@@ -92,7 +94,22 @@ set(PROJECT_SOURCES
 	# src/utils/math/FastNoiseSIMD/FastNoiseSIMD_sse2.cpp
 	# src/utils/math/FastNoiseSIMD/FastNoiseSIMD_sse41.cpp
 	# src/utils/math/FastNoiseSIMD/ARM/cpu-features.c
-	src/utils/resource_manager.cpp
+    src/utils/resource_manager.cpp
+    
+    src/graphics/imgui/imconfig.h
+    src/graphics/imgui/imgui_demo.cpp
+    src/graphics/imgui/imgui_draw.cpp
+    src/graphics/imgui/imgui_impl_glfw.cpp
+    src/graphics/imgui/imgui_impl_glfw.h
+    src/graphics/imgui/imgui_impl_opengl3.cpp
+    src/graphics/imgui/imgui_impl_opengl3.h
+    src/graphics/imgui/imgui_internal.h
+    src/graphics/imgui/imgui_widgets.cpp
+    src/graphics/imgui/imgui.cpp
+    src/graphics/imgui/imgui.h
+    src/graphics/imgui/imstb_rectpack.h
+    src/graphics/imgui/imstb_textedit.h
+    src/graphics/imgui/imstb_truetype.h
 )
 
 file(GLOB PROJECT_HEADERS include/*.hpp)

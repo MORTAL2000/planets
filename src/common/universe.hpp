@@ -1,12 +1,13 @@
 #pragma once
 
 #include "planet.hpp"
+#include "utils/generation/planet_generator.hpp"
 
 class Universe {
     private:
         double time;
 
-        
+        PlanetGenerator generator;
         Planet earth;
     public:
         Universe(const char *loadFilePath=NULL);
