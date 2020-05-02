@@ -7,7 +7,7 @@
 #include "utils/resource_manager.hpp"
 
 WaterRenderer::WaterRenderer() {
-    Shader shader = ResourceManager::LoadShader("planet.vert", "planet.frag", "planet");
+    Shader shader = ResourceManager::LoadShader("water.vert", "water.frag", "water");
     check_gl_error();
 
     foamTexture = ResourceManager::LoadTexture("textures/tc_foam.dds", "foam");
@@ -15,14 +15,14 @@ WaterRenderer::WaterRenderer() {
 }
 
 void WaterRenderer::render() {
-    Shader shader = ResourceManager::GetShader("planet");
+    Shader shader = ResourceManager::GetShader("water");
     shader.enable();
 
     applyUniforms(shader);
 
     Universe universe = Globals::scene->getUniverse();
 
-    universe.getPlanet()->mesh->render();
+    universe.getPlanet()->waterMesh->render();
 }
 
 void WaterRenderer::applyUniforms(Shader & shader) {

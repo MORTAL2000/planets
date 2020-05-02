@@ -8,7 +8,9 @@
 
 // Local Headers
 #include "graphics/window_size.hpp"
+#include "graphics/input/key_input.hpp"
 #include "graphics/input/mouse_input.hpp"
+#include "graphics/imgui/imgui.h"
 
 
 PlanetCamera::PlanetCamera(Camera *cam, Planet *plt)
@@ -21,10 +23,36 @@ const int DRAG_BUTTON = GLFW_MOUSE_BUTTON_LEFT;
 void PlanetCamera::update(float dt)
 {
     auto prevPos = camera->position;
+
+    ImGuiIO& io = ImGui::GetIO();
+
+    if (KeyInput::pressed(GLFW_KEY_W))
+        camera->position += camera->direction * glm::vec3(dt * speedMultiplier);
+
+    if (KeyInput::pressed(GLFW_KEY_S))
+        camera->position += camera->direction * glm::vec3(-dt * speedMultiplier);
+
+    if (KeyInput::pressed(GLFW_KEY_D))
+        camera->position += camera->right * glm::vec3(dt * speedMultiplier);
+
+    if (KeyInput::pressed(GLFW_KEY_A))
+        camera->position += camera->right * glm::vec3(-dt * speedMultiplier);
+
+    if (KeyInput::pressed(GLFW_KEY_Q))
+        camera->rotate(-dt * speedMultiplier, camera->direction);
+
+    if (KeyInput::pressed(GLFW_KEY_E))
+        camera->rotate(dt * speedMultiplier, camera->direction);
     
     bool startDrag = MouseInput::justPressed(DRAG_BUTTON),
          dragging = MouseInput::pressed(DRAG_BUTTON),
          stoppedDragging = MouseInput::justReleased(DRAG_BUTTON);
+
+    if (MouseInput::mouseX < 0 || MouseInput::mouseY < 0 || MouseInput::mouseX > WindowSize::width || MouseInput::mouseY > WindowSize::height) {
+        startDrag  = false;
+        dragging = false;
+        stoppedDragging = false;
+    }
     
     if (dragging || startDrag)
     {
@@ -38,21 +66,23 @@ void PlanetCamera::update(float dt)
     else
     {
         accurateDraggingStarted = false;
-        bool
-            up = MouseInput::mouseY < 35,
-            down = MouseInput::mouseY > WindowSize::height - 35,
-            left = MouseInput::mouseX < 35,
-            right = MouseInput::mouseX > WindowSize::width - 35;
+        // bool
+        //     up = MouseInput::mouseY < 35,
+        //     down = MouseInput::mouseY > WindowSize::height - 35,
+        //     left = MouseInput::mouseX < 35,
+        //     right = MouseInput::mouseX > WindowSize::width - 35;
 
-        float moveSpeed = 50. - actualZoom * 20.;
+        // float moveSpeed = 50. - actualZoom * 20.;
 
-        if (up) lat -= dt * moveSpeed;
-        else if (down) lat += dt * moveSpeed;
+        // if (up) lat -= dt * moveSpeed;
+        // else if (down) lat += dt * moveSpeed;
 
-        if (left) lon -= dt * moveSpeed;
-        else if (right) lon += dt * moveSpeed;
+        // if (left) lon -= dt * moveSpeed;
+        // else if (right) lon += dt * moveSpeed;
 
-        if (stoppedDragging) afterDragTimer = .5;
+        // Slowly drift to an orbit after a timeout
+
+        if (stoppedDragging) afterDragTimer = 1;
 
         if (afterDragTimer > 0)
         {

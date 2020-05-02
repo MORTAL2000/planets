@@ -65,51 +65,67 @@ float PlanetGenerator::calculateElevation(const glm::vec3 & unitSphere) {
 
 void PlanetGenerator::generate(Planet *plt)
 {
-    VertAttributes attrs;
-    unsigned int posOffset = attrs.add(VertAttributes::POSITION);
-    unsigned int norOffset = attrs.add(VertAttributes::NORMAL);
-    unsigned int texOffset = attrs.add(VertAttributes::TEX_COORDS);
+    VertAttributes terrainAttrs;
+    unsigned int posOffset = terrainAttrs.add(VertAttributes::POSITION);
+    unsigned int norOffset = terrainAttrs.add(VertAttributes::NORMAL);
+    unsigned int texOffset = terrainAttrs.add(VertAttributes::TEX_COORDS);
+    unsigned int tanOffset = terrainAttrs.add(VertAttributes::TANGENT);
+    unsigned int yLevelOffset = terrainAttrs.add({"Y_LEVEL", 1});
+
+    VertAttributes waterAttrs;
+    waterAttrs.add_(VertAttributes::POSITION)
+        .add_(VertAttributes::NORMAL)
+        .add_(VertAttributes::TEX_COORDS)
+        .add_(VertAttributes::TANGENT);
 
     PlanetConfig config = plt->config;
 
     // Make a unit sphere
-    Cubesphere sphere(1, config.subdivision, false);
+    Cubesphere cubesphere(1, config.subdivision, false);
 
-    unsigned int nIndices = sphere.getIndexCount();
-    unsigned int nVertices = sphere.getVertexCount();
+    Sphere sphere(config.radius);
+
+    unsigned int nIndices = cubesphere.getIndexCount();
+    unsigned int nVertices = cubesphere.getVertexCount();
   
-    plt->mesh = std::make_shared<Mesh>(plt->config.name, nVertices, nIndices, attrs);
+    plt->terrainMesh = std::make_shared<Mesh>(plt->config.name + "_terrain", nVertices, nIndices, terrainAttrs);
+    plt->waterMesh = sphere.generate(plt->config.name + "_water", 100, 70, waterAttrs); //sphere.gstd::make_shared<Mesh>(plt->config.name + "_water", nVertices, nIndices, attrs);
     
-    const float * vertices = sphere.getVertices();
-    const float * normals = sphere.getNormals();
-    const float * texCords = sphere.getTexCoords();
+    const float * vertices = cubesphere.getVertices();
+    const float * normals = cubesphere.getNormals();
+    const float * texCords = cubesphere.getTexCoords();
 
-    
 
     for (unsigned int i = 0; i < nVertices; i++) {
+        // plt->waterMesh->set(glm::vec3(vertices[3 * i], vertices[3 * i + 1], vertices[3 * i + 2]), i, posOffset);
+        
+
         glm::vec3 pos(vertices[3 * i], vertices[3 * i + 1], vertices[3 * i + 2]);
     //        glm::vec3 normal = earth->mesh->get<glm::vec3>(vertI, normOffset);
         glm::vec3 normal = glm::normalize(pos - config.center);
 
         // Creating noise!
-        float height = config.radius + calculateElevation(pos);
-        std::cout << "Height for pos: " << glm::to_string(pos) << " " << height << std::endl;
-        plt->mesh->set<glm::vec3>(pos + (height * normal), i, posOffset);
+        float terrainHeight = calculateElevation(pos);
+
+        plt->terrainMesh->set(terrainHeight, i, yLevelOffset);
+
+        std::cout << "Height for pos: " << glm::to_string(pos) << " " << terrainHeight  + config.radius << std::endl;
+        plt->terrainMesh->set<glm::vec3>(pos + ((terrainHeight + config.radius) * normal), i, posOffset);
 
         // float elevation = 5 * calculateElevation(pointOnUnitSphere);
     
         // plt->mesh->set(config.radius * ((1 + elevation) * pointOnUnitSphere), i, posOffset);
-
-        plt->mesh->set(glm::vec3(normals[3 * i], normals[3 * i + 1], normals[3 * i + 2]), i, norOffset);
-        plt->mesh->set(glm::vec2(texCords[2 * i], texCords[2 * i + 1]), i, texOffset);
+        // Recalculate textures and normals
+        plt->terrainMesh->set(glm::vec3(normals[3 * i], normals[3 * i + 1], normals[3 * i + 2]), i, norOffset);
+        plt->terrainMesh->set(glm::vec2(texCords[2 * i], texCords[2 * i + 1]), i, texOffset);
     }
 
-    const unsigned int * indices = sphere.getIndices();
+    const unsigned int * indices = cubesphere.getIndices();
     for (unsigned int i = 0; i < nIndices; i++) {
-        plt->mesh->indices[i] = indices[i];
+        plt->terrainMesh->indices[i] = indices[i];
     }
 
-    // applyNoiseToMesh(plt->mesh);
+    TangentCalculator::addTangentsToMesh(plt->terrainMesh);
 
     plt->upload();
 }

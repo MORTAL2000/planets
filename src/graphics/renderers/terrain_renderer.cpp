@@ -47,7 +47,7 @@ void TerrainRenderer::render() {
 
     Universe universe = Globals::scene->getUniverse();
 
-    universe.getPlanet()->mesh->render();
+    universe.getPlanet()->terrainMesh->render();
 
     // Draw grids
     // for (auto isl : universe.getPlanet()->land)
@@ -71,8 +71,8 @@ void TerrainRenderer::applyUniforms(Shader & shader) {
     // glUniform2f(shader.uniform("scrSize"), WindowSize::widthPixels, WindowSize::heightPixels);
     // glUniform3f(shader.uniform("camPos"), camera.position.x, camera.position.y, camera.position.z);
     // glUniform3f(shader.uniform("sunDir"), camera.sunDir.x, camera.sunDir.y, camera.sunDir.z);
-    glUniform3f(shader.uniform("planetCenter"), 0.f, 0.f, 0.f);
-    glUniform1f(shader.uniform("seaLevel"), 150.f);
+    // glUniform3f(shader.uniform("planetCenter"), 0.f, 0.f, 0.f);
+    // glUniform1f(shader.uniform("seaLevel"), 150.f);
     
     // glUniform1i(shader.uniform("backgroundTerrainLayer"), 0);
     // glUniform4f(shader.uniform("terrainLayers"), 2, 4, 5, 6);

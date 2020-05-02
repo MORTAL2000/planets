@@ -31,7 +31,8 @@ class Planet {
         // Sphere sphere;
 
         
-        SharedMesh mesh;
+        SharedMesh terrainMesh;
+        SharedMesh waterMesh;
 
         Planet(PlanetConfig config);
         PlanetConfig config;
@@ -50,7 +51,4 @@ class Planet {
         void toBinary(std::vector<uint8> &out) const;
 
         void fromBinary(const std::vector<uint8> &in, unsigned int inputOffset = 0);
-
-
-        void destroyLandMasses();
 };

@@ -16,11 +16,11 @@ struct NoiseLayer {
 };
 
 static NoiseLayer CONTINENTS = {
-    4, 5.f, 1.07, 2.2, 0.5, -4
+    4, 2.5f, 1.07, 2.2, 0.5, -4
 };
 
 static NoiseLayer MOUNTAINS = {
-    4, 5.42, 1.59, 3.3, 0.5, 0.37
+    4, 5.42, 2.59, 4.3, 0.8, 0.37
 };
 
 class PlanetGenerator {

@@ -16,6 +16,7 @@ class PlanetCamera
 
     void update(float dt);
 
+    float speedMultiplier = 1;
     float zoomVelocity = 0;
     float lon = 160, lat = 75, zoom = 0, actualZoom = 0;
     float horizonDistance = -1;

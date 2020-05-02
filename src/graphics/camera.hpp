@@ -33,6 +33,7 @@ class Camera {
         glm::vec3 getCursorRayDirection() const;
         glm::vec3 getRayDirection(float viewportX, float viewportY) const;
 
+        void orientUp(glm::vec3 new_up);
         void lookAt(glm::vec3 target);
         void lookAt(glm::vec3 target, glm::vec3 localYAxis);
         

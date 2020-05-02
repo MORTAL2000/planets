@@ -178,6 +178,8 @@ int main(int argc, char * argv[]) {
         Globals::scene->draw(min(delta_time, .1));
         check_gl_error();
 
+        // ImGui::ShowDemoWindow();
+
         KeyInput::update();
         MouseInput::update();
 

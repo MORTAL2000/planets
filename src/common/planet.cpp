@@ -24,15 +24,8 @@ void Planet::upload()
     //     buffer->add(isl->terrainMesh);
     // }
     // if (buffer) buffer->upload();
-    VertBuffer::uploadSingleMesh(mesh);
-}
-
-// must be called to delete islands.
-// NOTE!!!!: is also called when planet generation restarts
-void Planet::destroyLandMasses()
-{
-    // for (LandMass *landmass : land) delete landmass;
-    // land.clear();
+    VertBuffer::uploadSingleMesh(terrainMesh);
+    VertBuffer::uploadSingleMesh(waterMesh);
 }
 
 float Planet::longitude(float x, float z) const

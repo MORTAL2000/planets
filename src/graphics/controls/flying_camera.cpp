@@ -20,6 +20,9 @@ void FlyingCamera::update(float dt)
     speedMultiplier += MouseInput::yScroll * .5;
     if (speedMultiplier < 0) speedMultiplier = 0;
 
+    if (KeyInput::pressed(GLFW_KEY_O))
+        camera->orientUp(glm::normalize(camera->position));
+    
     if (KeyInput::pressed(GLFW_KEY_W))
         camera->position += camera->direction * glm::vec3(dt * speedMultiplier);
 
@@ -32,11 +35,17 @@ void FlyingCamera::update(float dt)
     if (KeyInput::pressed(GLFW_KEY_A))
         camera->position += camera->right * glm::vec3(-dt * speedMultiplier);
 
+    if (KeyInput::pressed(GLFW_KEY_Q))
+        camera->rotate(-dt * speedMultiplier, camera->direction);
+
+    if (KeyInput::pressed(GLFW_KEY_E))
+        camera->rotate(dt * speedMultiplier, camera->direction);
+
     if (KeyInput::pressed(GLFW_KEY_LEFT_SHIFT))
-        camera->position.y -= dt * speedMultiplier;
+        camera->position -= camera->up * glm::vec3(dt * speedMultiplier);
 
     if (KeyInput::pressed(GLFW_KEY_SPACE))
-        camera->position.y += dt * speedMultiplier;
+        camera->position += camera->up * glm::vec3(dt * speedMultiplier);
 
     if (MouseInput::deltaMouseX != 0)
         camera->rotate(MouseInput::deltaMouseX / WindowSize::width * -100 * mouseSensivity, camera->up);

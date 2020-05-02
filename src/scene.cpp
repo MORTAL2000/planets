@@ -17,6 +17,7 @@ Scene::Scene():
     camera.update();
 
     flyingCamera.speedMultiplier = 100;
+    planetCamera.speedMultiplier = 100;
 
     // phong_renderer = new PhongRenderer();
 
@@ -68,7 +69,7 @@ void Scene::draw(float dt) {
     // cam.update();
 
     // Render shadows
-    // underwater_renderer.render();
+    underwater_renderer.render();
     check_gl_error();
 
     // sceneBuffer->bind();
@@ -78,14 +79,14 @@ void Scene::draw(float dt) {
     terrain_renderer.render();
     check_gl_error();
 
-    glEnable(GL_BLEND);
-    // water_renderer.render();
+    // glEnable(GL_BLEND);
+    water_renderer.render();
     check_gl_error();
 
     // space_renderer.renderBox();
     // atmosphere
     // cloud_renderer.render(time, newDeltaTime, cam, sunDir, &lvl->earth);
-    glDisable(GL_BLEND);
+    // glDisable(GL_BLEND);
 
     universe.update(dt);
     check_gl_error();

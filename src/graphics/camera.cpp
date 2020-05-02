@@ -33,6 +33,12 @@ void Camera::lookAt(vec3 target, vec3 localYAxis)
     up = glm::normalize(glm::cross(right, direction));
 }
 
+void Camera::orientUp(vec3 new_up)
+{
+    up = new_up;
+    right = glm::normalize(glm::cross(direction, new_up));
+}
+
 
 void Camera::rotate(float degrees, glm::vec3 axis)
 {

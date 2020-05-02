@@ -5,7 +5,6 @@ precision highp sampler2DArray;
 // in vec3 v_normal, v_tangent;
 in vec2 v_texCoords;
 in float v_y;
-in vec4 v_texBlend;
 // in vec3 v_sunDirTanSpace;
 // in vec3 v_toCamera;
 // in float v_shadowOpacity;
