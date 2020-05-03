@@ -9,6 +9,7 @@
 #include "utils/file/file.h"
 
 #include "utils/generation/planet_generator.hpp"
+#include "graphics/input/key_input.hpp"
 
 const float EARTH_RADIUS = 150, ATMOSPHERE_RADIUS = 198;
 
@@ -38,6 +39,14 @@ Universe::Universe(const char *loadFilePath): earth(getEarthConfig()) {
 
 void Universe::update(float dt) {
     time += dt;
+
+    if (KeyInput::justPressed(GLFW_KEY_R))
+    {
+        generator.generate(&earth);
+        debugOpen = true;
+    }
+
+    if (debugOpen) PlanetGenerator::ShowDebugWindow(&debugOpen);
 }
 
 Planet * Universe::getPlanet() {

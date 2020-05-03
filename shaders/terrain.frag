@@ -2,7 +2,8 @@
 precision mediump float;
 precision highp sampler2DArray;
 
-// in vec3 v_normal, v_tangent;
+in vec3 v_planetNormal; // , v_tangent;
+in vec3 v_normal; // , v_tangent;
 in vec2 v_texCoords;
 in float v_y;
 // in vec3 v_sunDirTanSpace;
@@ -29,7 +30,7 @@ const float WATER_HEIGHT = 0.0,
             SAND_HEIGHT = 0.1,
             GRASS_HEIGHT = 0.5,
             ROCK_HEIGHT = 9.,
-            SNOW_HEIGHT = 18.;
+            SNOW_HEIGHT = 25.;
 
 // const int   SAND_TEX = 0,
 //             ROCK_TEX = 2,
@@ -37,22 +38,22 @@ const float WATER_HEIGHT = 0.0,
 //             DEAD_GRASS_TEX = 5,
 //             ROCK2_TEX = 6;
 
-const float GRASS_TRANSITION = SAND_HEIGHT + (1.0f/1.5f) * (GRASS_HEIGHT - SAND_HEIGHT);
+#define M_PI 3.1415926535897932384626433832795
+
+const float GRASS_TRANSITION = 0.2; // SAND_HEIGHT + (1.0f/1.5f) * (GRASS_HEIGHT - SAND_HEIGHT);
 
 vec3 createBaseColor() 
 {
     // Texture colors
     vec3 GRASS_COLOR = texture(grassTexture, v_texCoords).rgb;
     vec3 GROUND_COLOR = texture(groundTexture, v_texCoords).rgb;
-    vec3 ROCK_COLOR = texture(rockTexture, v_texCoords).rgb;
-    vec3 WATER_COLOR = ROCK_COLOR;
+   
     vec3 WATER_COLOR_DEEP = vec3(28.5f / 255.f,48.0f/ 255.f,78.0f/ 255.f);
     vec3 SAND_COLOR = texture(sandTexture, v_texCoords).rgb;
-    vec3 SNOW_COLOR = texture(snowTexture, v_texCoords).rgb;
-
+   
     // Solid color
     if(v_y <= WATER_HEIGHT){
-        return mix(SAND_COLOR, WATER_COLOR_DEEP, (v_y) / (WATER_HEIGHT_DEEP));
+        return SAND_COLOR;
     } else if (v_y > WATER_HEIGHT && v_y <= SAND_HEIGHT){
         return SAND_COLOR;
     } else if (v_y > SAND_HEIGHT && v_y <= GRASS_HEIGHT){
@@ -63,12 +64,33 @@ vec3 createBaseColor()
         }
         
         return mix(SAND_COLOR, GRASS_COLOR, mixCoeff);
-    } else if (v_y > GRASS_HEIGHT && v_y <= ROCK_HEIGHT){
-        return mix(GRASS_COLOR, ROCK_COLOR, (v_y-GRASS_HEIGHT) / (ROCK_HEIGHT-GRASS_HEIGHT));
-    } else if (v_y > ROCK_HEIGHT){
-        return mix(ROCK_COLOR, SNOW_COLOR, (v_y-ROCK_HEIGHT) / (SNOW_HEIGHT-ROCK_HEIGHT));
+    } else {
+        return GRASS_COLOR;
+    } 
+}
+
+void applySteepRocks(inout vec3 color) {
+    vec3 ROCK_COLOR = texture(rockTexture, v_texCoords).rgb;
+
+    float slope = acos(dot(v_planetNormal, v_normal)) / M_PI;
+
+    // Determine which texture to use based on height.
+    if((slope < 0.2) && slope >= 0.15 )
+    {
+        float blendAmount = (slope - (0.15f)) * (1.0f / (0.2f - (0.15f)));
+        color = mix(color, ROCK_COLOR, blendAmount);
+    } else if (slope > 0.2f) {
+        color = ROCK_COLOR;
+    }
+
+    vec3 SNOW_COLOR = texture(snowTexture, v_texCoords).rgb;
+
+    if (v_y > ROCK_HEIGHT){
+        color = mix(ROCK_COLOR, SNOW_COLOR, (v_y-ROCK_HEIGHT) / (SNOW_HEIGHT-ROCK_HEIGHT));
     }
 }
+
+    // color = vec3(slope / M_PI, 0, 0);
 
 // void applyTerrainSlope(inout vec3 color) {
 //     float slope = dot(gridNormal, vert);
@@ -122,6 +144,8 @@ void main() {
     vec3 baseColor = createBaseColor();
     // vec3 normal = vec3(0);
 
+    applySteepRocks(baseColor);
+    // applySnowCaps(baseColor);
     // // normal *= 2.;
     // // normal -= 1.;
 

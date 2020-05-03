@@ -25,10 +25,10 @@ TerrainRenderer::TerrainRenderer() {
     //     "textures/tc_rock2_normal.dds",
     // }, "terrain_textures");
 
-    grass = ResourceManager::LoadTexture("textures/grass.tga", "grass");
-    ground = ResourceManager::LoadTexture("textures/ground.tga", "ground");
-    rock = ResourceManager::LoadTexture("textures/rock512.tga", "rock");
-    sand = ResourceManager::LoadTexture("textures/sand256.tga", "sand");
+    grass = ResourceManager::LoadTexture("textures/tc_grass.dds", "grass");
+    ground = ResourceManager::LoadTexture("textures/tc_grass_dead.dds", "ground");
+    rock = ResourceManager::LoadTexture("textures/tc_rock.dds", "rock");
+    sand = ResourceManager::LoadTexture("textures/tc_sand.dds", "sand");
     snow = ResourceManager::LoadTexture("textures/snow512.tga", "snow");
 
     check_gl_error();
@@ -71,7 +71,7 @@ void TerrainRenderer::applyUniforms(Shader & shader) {
     // glUniform2f(shader.uniform("scrSize"), WindowSize::widthPixels, WindowSize::heightPixels);
     // glUniform3f(shader.uniform("camPos"), camera.position.x, camera.position.y, camera.position.z);
     // glUniform3f(shader.uniform("sunDir"), camera.sunDir.x, camera.sunDir.y, camera.sunDir.z);
-    // glUniform3f(shader.uniform("planetCenter"), 0.f, 0.f, 0.f);
+    glUniform3f(shader.uniform("planetCenter"), 0.f, 0.f, 0.f);
     // glUniform1f(shader.uniform("seaLevel"), 150.f);
     
     // glUniform1i(shader.uniform("backgroundTerrainLayer"), 0);

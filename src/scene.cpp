@@ -17,7 +17,7 @@ Scene::Scene():
     camera.update();
 
     flyingCamera.speedMultiplier = 100;
-    planetCamera.speedMultiplier = 100;
+//    planetCamera.speedMultiplier = 100;
 
     // phong_renderer = new PhongRenderer();
 
@@ -40,6 +40,7 @@ Scene::Scene():
 
 void Scene::draw(float dt) {
     check_gl_error();
+
     if (KeyInput::justPressed(GLFW_KEY_G))
         MouseInput::setLockedMode(false);
     else if (KeyInput::justReleased(GLFW_KEY_G) && !camPlanetMode)
@@ -59,7 +60,7 @@ void Scene::draw(float dt) {
     else if (!KeyInput::pressed(GLFW_KEY_G))
         flyingCamera.update(dt); // flying camera movement
 
-    camera.sunDir = universe.calculateSunDirection(planetCamera.lat, planetCamera.lon, planetCamera.actualZoom);
+    camera.sunDir = glm::vec3(1, 0, 0); // universe.calculateSunDirection(planetCamera.lat, planetCamera.lon, planetCamera.actualZoom);
    
 
     glEnable(GL_BLEND);

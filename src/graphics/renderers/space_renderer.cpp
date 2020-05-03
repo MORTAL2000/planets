@@ -49,7 +49,7 @@ void SpaceRenderer::renderBox()
 
     cubeMap->bind(0);
     glUniform1i(shader.uniform("cubemap"), 0);
-    glUniform1f(shader.uniform("zoomedIn"), Globals::scene->planetCamera.actualZoom);
+//    glUniform1f(shader.uniform("zoomedIn"), Globals::scene->planetCamera.actualZoom);
 
     mat4 view = glm::rotate(camera.combined, (float) -atan2(camera.sunDir.z, camera.sunDir.x) + mu::PI * .5f, mu::Y);
 

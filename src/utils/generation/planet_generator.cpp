@@ -10,13 +10,48 @@
 #include "geometry/cubesphere.hpp"
 
 #include "graphics/tangent_calculator.hpp"
+#include "graphics/imgui/imgui.h"
 
+
+void PlanetGenerator::ShowDebugWindow(bool* p_open)
+{
+    ImGui::SetNextWindowSize(ImVec2(430,450), ImGuiCond_FirstUseEver);
+    if (!ImGui::Begin("Planet Generator", p_open))
+    {
+        ImGui::End();
+        return;
+    }
+
+    struct funcs
+    {
+        static void ConfigureNoiseLayer(int id, NoiseLayer & layer) {
+            ImGui::PushID(id);
+            ImGui::SliderInt("Number of Layers", &layer.numLayers, 0, 10);
+            ImGui::SliderFloat("Strength", &layer.strength, 0.0f, 10.0f);
+            ImGui::SliderFloat("Base Roughness" , &layer.baseRoughness, 0.0f, 10.0f);
+            ImGui::SliderFloat("Roughness", &layer.roughness, 0.0f, 10.0f);
+            ImGui::SliderFloat("Persistence", &layer.persistence, 0.0f, 10.0f);
+            ImGui::SliderFloat("Min Value", &layer.minValue, -20.0f, 20.0f);
+            ImGui::PopID();
+        }
+        
+    };
+
+    ImGui::Text("CONTINENTS");
+    funcs::ConfigureNoiseLayer(0, CONTINENTS);
+
+    ImGui::Text("MOUNTAINS");
+    funcs::ConfigureNoiseLayer(1, MOUNTAINS);
+
+    ImGui::End();
+}
 
 PlanetGenerator::PlanetGenerator() {
     planetNoise.SetNoiseType(FastNoise::Simplex);
 
     planetNoise.SetFrequency(1);
 }
+
 
 float PlanetGenerator::ridgedNoise(NoiseLayer config, const glm::vec3 & unitSphere, float weightMultiplier) {
         float noiseValue = 0;
@@ -65,6 +100,8 @@ float PlanetGenerator::calculateElevation(const glm::vec3 & unitSphere) {
 
 void PlanetGenerator::generate(Planet *plt)
 {
+    planetNoise.SetSeed(time(0));
+
     VertAttributes terrainAttrs;
     unsigned int posOffset = terrainAttrs.add(VertAttributes::POSITION);
     unsigned int norOffset = terrainAttrs.add(VertAttributes::NORMAL);
@@ -126,6 +163,7 @@ void PlanetGenerator::generate(Planet *plt)
     }
 
     TangentCalculator::addTangentsToMesh(plt->terrainMesh);
+    plt->terrainMesh->computeSmoothingNormals();
 
     plt->upload();
 }

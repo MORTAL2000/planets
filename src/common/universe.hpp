@@ -9,6 +9,7 @@ class Universe {
 
         PlanetGenerator generator;
         Planet earth;
+        bool debugOpen = false;
     public:
         Universe(const char *loadFilePath=NULL);
         

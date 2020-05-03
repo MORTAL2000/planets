@@ -25,8 +25,8 @@ void PostProcessing::render() {
 
 void PostProcessing::applyUniforms(Shader & shader) {
     
-    glUniform1f(shader.uniform("zoomEffect"), Globals::scene->planetCamera.zoomVelocity / 2.);
-    glUniform1f(shader.uniform("zoom"), Globals::scene->planetCamera.actualZoom);
+//    glUniform1f(shader.uniform("zoomEffect"), Globals::scene->planetCamera.zoomVelocity / 2.);
+//    glUniform1f(shader.uniform("zoom"), Globals::scene->planetCamera.actualZoom);
     glUniform2f(shader.uniform("resolution"), WindowSize::widthPixels, WindowSize::heightPixels);
 
     // Bind results from other buffers
