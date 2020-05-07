@@ -34,6 +34,17 @@ class Planet {
         SharedMesh terrainMesh;
         SharedMesh waterMesh;
 
+        /**
+         * Texture map of the planet.
+         * An planet can have 5 textures.
+         * 1 background texture and 4 extra textures.
+         *
+         * Each vertex has a vec4.
+         * 
+         * The n-th float of that vec4 tells how much of n-th texture should be rendered at the position of that vertex.
+         */
+        // std::vector<vec4> textureMap;
+
         Planet(PlanetConfig config);
         PlanetConfig config;
 

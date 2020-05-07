@@ -158,19 +158,18 @@ SharedTexArray ResourceManager::loadTextureArrayFromDDSFiles(const std::vector<s
 
     GLuint width = d.width, height = d.height, layerCount = datas.size(), mipMapCount = d.mipMapCount;
 
-    texarray->Max_Level = d.mipMapCount - 1;
+    texarray->Max_Level = mipMapCount;
     texarray->Internal_Format = d.format;
 
-    std::vector<unsigned char *> buffers;
-    for (auto &data : datas)
-    {
-        if (data.width != width || data.height != height || data.format != d.format || data.mipMapCount != mipMapCount)
+    unsigned char * buffers[layerCount];
+    for (unsigned int i = 0; i < layerCount; i++) {
+        if (datas[i].width != width || datas[i].height != height || datas[i].format != d.format || datas[i].mipMapCount != mipMapCount)
             throw "TextureArray: DDS files cannot have different dimensions/formats/mipmap-levels";
 
-        buffers.push_back(data.buffer);
+        buffers[i] = datas[i].buffer;
     }
 
-    // texarray->generate(width, height, buffers);
+    texarray->generate(width, height, layerCount, buffers);
 
     return SharedTexArray(texarray);
 }
@@ -210,24 +209,15 @@ SharedTexture ResourceManager::loadTextureFromDDSFile(const char *file) {
 
     Texture * texture = new Texture();
 
-    glBindTexture(GL_TEXTURE_2D, texture->id);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, data.mipMapCount - 1); // opengl likes array length of mipmaps
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // don't forget to enable mipmaping
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    
+    texture->Max_Level = data.mipMapCount - 1;
+    texture->Filter_Min = GL_LINEAR_MIPMAP_LINEAR;
+    texture->Filter_Max = GL_LINEAR;
+    texture->Wrap_S = GL_REPEAT;
+    texture->Wrap_T = GL_REPEAT;
+    texture->Internal_Format = data.format;
+
     unsigned int blockSize = (data.format == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT) ? 8 : 16;
-    unsigned int offset = 0, w = data.width, h = data.height;
-    for (unsigned int level = 0; level < data.mipMapCount && (data.width || data.height); ++level)
-    {
-        unsigned int size = ((w + 3) / 4) * ((h + 3) / 4) * blockSize;
-        glCompressedTexImage2D(GL_TEXTURE_2D, level, data.format, w, h, 0, size, data.buffer + offset);
-        offset += size;
-        w /= 2;
-        h /= 2;
-    }
+    texture->generateCompressed(data.width, data.height, blockSize, data.buffer);
 
     return SharedTexture(texture);
 }

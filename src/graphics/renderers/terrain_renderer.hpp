@@ -9,8 +9,8 @@
 
 class TerrainRenderer {
     private:
-        SharedTexture grass, ground, rock, sand, snow;
-        // SharedTexArray terrainTextures;
+        SharedTexture grass; //, ground, rock, sand, snow;
+        SharedTexArray terrainTextures;
         void applyUniforms(Shader & shader);
     public: 
         TerrainRenderer();

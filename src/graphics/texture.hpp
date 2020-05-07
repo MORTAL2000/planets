@@ -34,5 +34,6 @@ class Texture
         ~Texture();
 
         void generate(unsigned int width, unsigned int height, unsigned char* data);
+        void generateCompressed(unsigned int width, unsigned int height, unsigned int blocksize, unsigned char* data);
         void bind(GLuint unit);
 };

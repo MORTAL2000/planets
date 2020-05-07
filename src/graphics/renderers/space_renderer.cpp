@@ -13,22 +13,22 @@ SpaceRenderer::SpaceRenderer()
 {
     sunTexture = ResourceManager::LoadTexture("textures/sun/sun.dds", "sun");
 
-    cubeMap = ResourceManager::LoadCubeMap({
-        "textures/space_cubemap/right.dds",
-        "textures/space_cubemap/left.dds",
-        "textures/space_cubemap/top.dds",
-        "textures/space_cubemap/bottom.dds",
-        "textures/space_cubemap/front.dds",
-        "textures/space_cubemap/back.dds",
-    }, "space_cubemap");
-
-    flareTextures = ResourceManager::LoadTextureArray({
-        "textures/sun/flare1.dds",
-        "textures/sun/flare0.dds",
-        "textures/sun/flare3.dds",
-        "textures/sun/flare4.dds",
-        "textures/sun/flare5.dds"
-    }, "flare_textures");
+//    cubeMap = ResourceManager::LoadCubeMap({
+//        "textures/space_cubemap/right.dds",
+//        "textures/space_cubemap/left.dds",
+//        "textures/space_cubemap/top.dds",
+//        "textures/space_cubemap/bottom.dds",
+//        "textures/space_cubemap/front.dds",
+//        "textures/space_cubemap/back.dds",
+//    }, "space_cubemap");
+//
+//    flareTextures = ResourceManager::LoadTextureArray({
+//        "textures/sun/flare1.dds",
+//        "textures/sun/flare0.dds",
+//        "textures/sun/flare3.dds",
+//        "textures/sun/flare4.dds",
+//        "textures/sun/flare5.dds"
+//    }, "flare_textures");
 
     cube = ResourceManager::LoadModel("models/cube.obj", "cube")->meshes[0];
     // , &VertAttributes().add_(VertAttributes::POSITION))[0]->parts[0].mesh;

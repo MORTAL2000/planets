@@ -50,8 +50,9 @@ PlanetGenerator::PlanetGenerator() {
     planetNoise.SetNoiseType(FastNoise::Simplex);
 
     planetNoise.SetFrequency(1);
-}
 
+    deadGrassNoise.SetNoiseType(FastNoise::SimplexFractal);
+}
 
 float PlanetGenerator::ridgedNoise(NoiseLayer config, const glm::vec3 & unitSphere, float weightMultiplier) {
         float noiseValue = 0;
@@ -92,6 +93,102 @@ float PlanetGenerator::simpleNoise(NoiseLayer config, const glm::vec3 & unitSphe
     return noiseValue * config.strength;
 }
 
+float PlanetGenerator::calculateGrass(const glm::vec3 & unitSphere, VertexCharacteristics v) {
+    if (v.height < GRASS_LEVEL || v.height > ROCK_LEVEL) return 0;
+
+    float frequency = 6;
+    float noise = 0.5 * (grassNoise.GetValue(unitSphere.x * frequency, unitSphere.y * frequency, unitSphere.z * frequency) + 1);
+
+    float steepness = v.maxNeighbor - v.minNeighbor;
+    float rockiness = 0.f; //clamp(steepness, 0.f, 1.f);
+
+    // int maxDist = 1 + (int)(30 * abs(noise));
+    // float dist = max(0.f, min(v.distToGrass, (float) maxDist + 3) - 3);
+    return clamp(noise * (1-rockiness), 0.f, 1.f);
+}
+
+float PlanetGenerator::calculateDeadGrass(const glm::vec3 & unitSphere, VertexCharacteristics v) {
+    if (v.height < GRASS_LEVEL || v.height > ROCK_LEVEL) return 0;
+    // float noiseX = x + DEAD_GRASS_NOISE_OFFSET, noiseY = y + DEAD_GRASS_NOISE_OFFSET;
+
+    float noise = deadGrassNoise.GetValue(unitSphere.x + DEAD_GRASS_NOISE_OFFSET, unitSphere.y + DEAD_GRASS_NOISE_OFFSET, unitSphere.z + DEAD_GRASS_NOISE_OFFSET);
+
+    return clamp((noise - .2) * 3., 0.0, 1.0);
+}
+
+float PlanetGenerator::calculateRock2(const glm::vec3 & unitSphere, VertexCharacteristics v) {
+    if (v.height < ROCK_LEVEL) return 0;
+
+    float noise = planetNoise.GetValue(unitSphere.x, unitSphere.y, unitSphere.z);
+
+    return 1. - clamp<float>(v.maxNeighbor - v.height, 0., 1.);
+}
+
+float PlanetGenerator::calculateRock(const glm::vec3 & unitSphere, VertexCharacteristics v) {
+    if (v.height < ROCK_LEVEL) return 0;
+
+    float steepness = v.maxNeighbor - v.minNeighbor;
+
+    float rockness = clamp<float>(steepness, 0., 1.) + (v.height > 3 ? 1 : 0);
+    // rockness *= 1. - v.distToRock / 3.;
+    return rockness;
+}
+
+
+void PlanetGenerator::addTextureMaps(Mesh * mesh) {
+    VertAttributes &attrs = mesh->attributes;
+    unsigned int posOffset = attrs.getOffset(VertAttributes::POSITION); 
+    unsigned int texOffset = attrs.getOffset({"TEX_BLEND", 4});
+    unsigned int yLevelOffset = attrs.getOffset({"Y_LEVEL", 1});
+
+    std::vector<VertexCharacteristics> characteristics(mesh->nrOfVertices, {99999, -99999, 99999});
+
+    // Calculate attributes with on neighbors 
+    for (int i = 0; i < mesh->nrOfIndices; i += 3)
+    {
+        int vertI0 = mesh->indices[i], vertI1 = mesh->indices[i + 1], vertI2 = mesh->indices[i + 2];
+        auto p0 = mesh->get<glm::vec3>(vertI0, posOffset),
+            p1 = mesh->get<glm::vec3>(vertI1, posOffset),
+            p2 = mesh->get<glm::vec3>(vertI2, posOffset);
+
+        auto y0 = mesh->get<float>(vertI0, yLevelOffset),
+            y1 = mesh->get<float>(vertI1, yLevelOffset),
+            y2 = mesh->get<float>(vertI2, yLevelOffset);
+
+        characteristics[vertI0].height = y0;
+        characteristics[vertI1].height = y1;
+        characteristics[vertI2].height = y2;
+
+        // Rock isl->distToHeight(x, y, 1.5, 999, 3)
+
+        float minHeight = min(y0, min(y1, y2));
+        characteristics[vertI0].minNeighbor = min(characteristics[vertI0].minNeighbor, minHeight);
+        characteristics[vertI1].minNeighbor = min(characteristics[vertI1].minNeighbor, minHeight);
+        characteristics[vertI1].minNeighbor = min(characteristics[vertI1].minNeighbor, minHeight);
+
+        float maxHeight = max(y0, max(y1, y2));
+        characteristics[vertI0].maxNeighbor = max(characteristics[vertI0].maxNeighbor, maxHeight);
+        characteristics[vertI1].maxNeighbor = max(characteristics[vertI1].maxNeighbor, maxHeight);
+        characteristics[vertI1].maxNeighbor = max(characteristics[vertI1].maxNeighbor, maxHeight);
+    }
+
+    for (int i = 0; i < mesh->nrOfIndices; i ++) {
+        int vertI = mesh->indices[i];
+
+        auto pos = mesh->get<glm::vec3>(vertI, posOffset);
+
+        VertexCharacteristics v = characteristics[vertI];
+
+        glm::vec4 textureMap(0.f, 0.f, 0, 0);
+        textureMap[GRASS_TEX] = calculateGrass(pos, v);
+        textureMap[DEAD_GRASS_TEX] = calculateDeadGrass(pos, v);
+        textureMap[ROCK_TEX] = calculateRock(pos, v);
+        textureMap[ROCK2_TEX] = calculateRock2(pos, v);
+        
+        mesh->add<glm::vec4>(textureMap, vertI, texOffset);
+    }
+}
+
 float PlanetGenerator::calculateElevation(const glm::vec3 & unitSphere) {
     float continent = simpleNoise(CONTINENTS, unitSphere);
 
@@ -105,8 +202,9 @@ void PlanetGenerator::generate(Planet *plt)
     VertAttributes terrainAttrs;
     unsigned int posOffset = terrainAttrs.add(VertAttributes::POSITION);
     unsigned int norOffset = terrainAttrs.add(VertAttributes::NORMAL);
-    unsigned int texOffset = terrainAttrs.add(VertAttributes::TEX_COORDS);
+    unsigned int uvOffset = terrainAttrs.add(VertAttributes::TEX_COORDS);
     unsigned int tanOffset = terrainAttrs.add(VertAttributes::TANGENT);
+    unsigned int texOffset = terrainAttrs.add({"TEX_BLEND", 4});
     unsigned int yLevelOffset = terrainAttrs.add({"Y_LEVEL", 1});
 
     VertAttributes waterAttrs;
@@ -132,6 +230,7 @@ void PlanetGenerator::generate(Planet *plt)
     const float * normals = cubesphere.getNormals();
     const float * texCords = cubesphere.getTexCoords();
 
+    std::vector<vec4> textureMap(nVertices, vec4());
 
     for (unsigned int i = 0; i < nVertices; i++) {
         // plt->waterMesh->set(glm::vec3(vertices[3 * i], vertices[3 * i + 1], vertices[3 * i + 2]), i, posOffset);
@@ -149,12 +248,10 @@ void PlanetGenerator::generate(Planet *plt)
         std::cout << "Height for pos: " << glm::to_string(pos) << " " << terrainHeight  + config.radius << std::endl;
         plt->terrainMesh->set<glm::vec3>(pos + ((terrainHeight + config.radius) * normal), i, posOffset);
 
-        // float elevation = 5 * calculateElevation(pointOnUnitSphere);
-    
-        // plt->mesh->set(config.radius * ((1 + elevation) * pointOnUnitSphere), i, posOffset);
         // Recalculate textures and normals
-        plt->terrainMesh->set(glm::vec3(normals[3 * i], normals[3 * i + 1], normals[3 * i + 2]), i, norOffset);
-        plt->terrainMesh->set(glm::vec2(texCords[2 * i], texCords[2 * i + 1]), i, texOffset);
+        // plt->terrainMesh->set(glm::vec3(normals[3 * i], normals[3 * i + 1], normals[3 * i + 2]), i, norOffset);
+        plt->terrainMesh->set(glm::vec2(texCords[2 * i], texCords[2 * i + 1]), i, uvOffset);
+        plt->terrainMesh->set(glm::vec4(0, 0, 0, 0), i, texOffset);
     }
 
     const unsigned int * indices = cubesphere.getIndices();
@@ -164,6 +261,8 @@ void PlanetGenerator::generate(Planet *plt)
 
     TangentCalculator::addTangentsToMesh(plt->terrainMesh);
     plt->terrainMesh->computeSmoothingNormals();
+
+    addTextureMaps(plt->terrainMesh.get());
 
     plt->upload();
 }

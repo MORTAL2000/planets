@@ -26,6 +26,6 @@ class TextureArray
     TextureArray();
     ~TextureArray();
 
-    void generate(unsigned int width, unsigned int height, unsigned int layers, unsigned char* data);
+    void generate(unsigned int width, unsigned int height, unsigned int layers, unsigned char ** buffers);
     void bind(GLuint unit);
 };

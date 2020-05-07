@@ -76,6 +76,7 @@ set(PROJECT_SOURCES
 	src/graphics/renderers/terrain_renderer.cpp
 	src/graphics/renderers/space_renderer.cpp
 	src/graphics/renderers/underwater_renderer.cpp
+	src/graphics/renderers/shadow_renderer.cpp
 	src/graphics/renderers/cloud_renderer.cpp
 	src/graphics/renderers/post_processing.cpp
     src/graphics/renderable.cpp

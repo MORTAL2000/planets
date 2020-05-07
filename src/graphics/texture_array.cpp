@@ -38,7 +38,7 @@ TextureArray::TextureArray():
     std::cout << "TextureArray id: " << id << " created\n";
 }
 
-void TextureArray::generate(unsigned int width, unsigned int height, unsigned int layers, unsigned char* data)
+void TextureArray::generate(unsigned int width, unsigned int height, unsigned int layers, unsigned char ** buffers)
 {
     this->width = width;
     this->height = height;
@@ -58,39 +58,23 @@ void TextureArray::generate(unsigned int width, unsigned int height, unsigned in
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
     
-    check_gl_error();
+    GLuint blockSize = (Internal_Format == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT) ? 8 : 16;
 
-    glTexImage3D(GL_TEXTURE_2D_ARRAY,
-            0,                     // mipmap level
-            this->Internal_Format, // gpu texel format
-            width,                 // width
-            height,                // height
-            layers,                // depth
-            0,                     // border
-            this->Image_Format,    // cpu pixel format
-            this->Texture_Type,    // cpu pixel coord type
-            data);                 // pixel data
-    glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
-
-    // GLuint blockSize = (Internal_Format == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT) ? 8 : 16;
-
-    // GLuint offset = 0, w = width, h = height;
-    // for (int mipMapLevel = 0; mipMapLevel < Max_Level; mipMapLevel++)
-    // {
-    //     GLuint size = ((w + 3) / 4) * ((h + 3) / 4) * blockSize;
-    //     glCompressedTexImage3D(GL_TEXTURE_2D_ARRAY, mipMapLevel, Internal_Format, w, h, layers, 0, size * layers, 0);
+    GLuint offset = 0, w = width, h = height;
+    for (unsigned int mipMapLevel = 0; mipMapLevel <= Max_Level; mipMapLevel++)
+    {
+        GLuint size = ((w + 3) / 4) * ((h + 3) / 4) * blockSize;
+        glCompressedTexImage3D(GL_TEXTURE_2D_ARRAY, mipMapLevel, Internal_Format, w, h, layers, 0, size * layers, 0);
         
-    //     int i = 0;
-    //     for (auto &buffer : buffers)
-    //     {
-    //         glCompressedTexSubImage3D(GL_TEXTURE_2D_ARRAY, mipMapLevel, 0, 0, i, w, h, 1, Internal_Format, size, buffer + offset);
+        for (unsigned int i = 0; i < this->layers; i++) {
+            std::cout << "Buffer generated: " << buffers[i] << std::endl;
+            glCompressedTexSubImage3D(GL_TEXTURE_2D_ARRAY, mipMapLevel, 0, 0, i, w, h, 1, Internal_Format, size, buffers[i] + offset);
+        }
 
-    //         i++;
-    //     }
-    //     offset += size;
-    //     w /= 2;
-    //     h /= 2;
-    // }
+        offset += size;
+        w /= 2;
+        h /= 2;
+    }
 
     // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
     // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, data.mipMapCount - 1); // opengl likes array length of mipmaps

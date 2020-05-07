@@ -7,6 +7,7 @@
 
 #include "graphics/renderable.hpp"
 #include "graphics/frame_buffer.hpp"
+#include "graphics/renderers/shadow_renderer.hpp"
 #include "graphics/renderers/terrain_renderer.hpp"
 #include "graphics/renderers/water_renderer.hpp"
 #include "graphics/renderers/space_renderer.hpp"
@@ -28,6 +29,7 @@ class Scene {
         FlyingCamera flyingCamera;
         PlanetCamera planetCamera;
         
+        ShadowRenderer shadow_renderer;
         UnderwaterRenderer underwater_renderer;
         TerrainRenderer terrain_renderer;
         WaterRenderer water_renderer;
