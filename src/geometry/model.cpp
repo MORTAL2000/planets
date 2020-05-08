@@ -48,13 +48,13 @@ void Model::load_model(std::string const &path) {
 
     m_GlobalInverseTransform = glm::inverse(aiMatrix4x4ToGlm(&scene->mRootNode->mTransformation));
 
-    if (scene->HasAnimations()) {
-        std::cout << "Scene has " << scene->mNumAnimations << " animations!" << std::endl;
-
-        for (size_t i = 0; i < scene->mNumAnimations; i++) {
-            processAnimation(scene->mAnimations[i], scene);
-        }
-    }
+//    if (scene->HasAnimations()) {
+//        std::cout << "Scene has " << scene->mNumAnimations << " animations!" << std::endl;
+//
+//        for (size_t i = 0; i < scene->mNumAnimations; i++) {
+//            processAnimation(scene->mAnimations[i], scene);
+//        }
+//    }
 
     if (scene->HasLights()) {
         std::cout << "Scene has " << scene->mNumLights << " lights!" << std::endl;
@@ -216,12 +216,12 @@ SharedMesh Model::processMesh(aiMesh * mesh, const aiScene* scene) {
     return sharedmesh;
 }
 
-void Model::processAnimation(aiAnimation * aianimation, const aiScene* scene) {
-    Animation animation;
-
-    animation.ticks_per_second = (float)(aianimation->mTicksPerSecond != 0 ? aianimation->mTicksPerSecond : 25.0f);
-    animation.duration = aianimation->mDuration;
-}
+//void Model::processAnimation(aiAnimation * aianimation, const aiScene* scene) {
+//    Animation animation;
+//
+//    animation.ticks_per_second = (float)(aianimation->mTicksPerSecond != 0 ? aianimation->mTicksPerSecond : 25.0f);
+//    animation.duration = aianimation->mDuration;
+//}
 
 
 // std::vector<VertexBoneData> Model::loadBones(const aiMesh* mesh) {
@@ -265,19 +265,19 @@ void Model::processAnimation(aiAnimation * aianimation, const aiScene* scene) {
 //     return ss.str();
 // }
 
-void Model::update_animation(float time) {
-    if (current_animation == -1) return;
-    
-//    Animation animation = animations[current_animation];
+//void Model::update_animation(float time) {
+//    if (current_animation == -1) return;
 //
-//    float time_in_ticks = time * animation.ticks_per_second;
-//    float animation_time = fmod(time_in_ticks, animation.duration);
-
-    // std::cout << "ticks_per_second: " << ticks_per_second << std::endl;
-    // std::cout << "time_in_ticks: " << time_in_ticks << std::endl;
-    // std::cout << "animation_time: " << animation_time << " out of " << (float)scene->mAnimations[0]->mDuration << std::endl;
-    // calculate_animation(num, animation_time, scene->mRootNode, glm::mat4(1.f));
-}
+////    Animation animation = animations[current_animation];
+////
+////    float time_in_ticks = time * animation.ticks_per_second;
+////    float animation_time = fmod(time_in_ticks, animation.duration);
+//
+//    // std::cout << "ticks_per_second: " << ticks_per_second << std::endl;
+//    // std::cout << "time_in_ticks: " << time_in_ticks << std::endl;
+//    // std::cout << "animation_time: " << animation_time << " out of " << (float)scene->mAnimations[0]->mDuration << std::endl;
+//    // calculate_animation(num, animation_time, scene->mRootNode, glm::mat4(1.f));
+//}
 
 uint Model::find_position(float time, const aiNodeAnim* pNodeAnim)
 {    
@@ -482,34 +482,34 @@ void Model::render() {
         // glUniformMatrix4fv( shader.uniform(CreateBoneUniform(i)), 1, GL_FALSE, glm::value_ptr(m_BoneInfo[i].FinalTransformation)  ); // model transformation
     // }
 }
-
-GLuint TextureFromData(const GLvoid *data, int width, int height, int nrComponents, bool gamma) {
-    check_gl_error();
-
-    GLuint textureID;
-    glGenTextures(1, &textureID);
-    
-    GLenum format;
-    if (nrComponents == 1)
-        format = GL_RED;
-    else if (nrComponents == 3)
-        format = GL_RGB;
-    else if (nrComponents == 4)
-        format = GL_RGBA;
-
-    glBindTexture(GL_TEXTURE_2D, textureID);
-    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-
-    check_gl_error();
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    check_gl_error();
-
-
-    return textureID;
-}
+//
+//GLuint TextureFromData(const GLvoid *data, int width, int height, int nrComponents) {
+//    check_gl_error();
+//
+//    GLuint textureID;
+//    glGenTextures(1, &textureID);
+//    
+//    GLenum format;
+//    if (nrComponents == 1)
+//        format = GL_RED;
+//    else if (nrComponents == 3)
+//        format = GL_RGB;
+//    else if (nrComponents == 4)
+//        format = GL_RGBA;
+//
+//    glBindTexture(GL_TEXTURE_2D, textureID);
+//    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+//    glGenerateMipmap(GL_TEXTURE_2D);
+//
+//    check_gl_error();
+//
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//
+//    check_gl_error();
+//
+//
+//    return textureID;
+//}

@@ -3,7 +3,7 @@
 #include <iostream>
 
 ShadowRenderer::ShadowRenderer()
-    : buffer(2048, 2048), sunCam(0, 300, 150, 150, 90)
+    : sunCam(0, 300, 150, 150, 90), buffer(2048, 2048)
 {
     buffer.addDepthTexture(GL_LINEAR, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);

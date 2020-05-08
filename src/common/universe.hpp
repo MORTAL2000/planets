@@ -11,7 +11,7 @@ class Universe {
         Planet earth;
         bool debugOpen = false;
     public:
-        Universe(const char *loadFilePath=NULL);
+        Universe();
         
         double getTime() { return time; }
 

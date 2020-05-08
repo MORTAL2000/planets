@@ -6,7 +6,7 @@
 #include "graphics/input/mouse_input.hpp"
 
 Scene::Scene():
-    universe(), camera(.1, 1000, 1, 1, 55), flyingCamera(&camera), planetCamera(&camera, universe.getPlanet()),
+    camera(.1, 1000, 1, 1, 55), universe(), flyingCamera(&camera), planetCamera(&camera, universe.getPlanet()),
     reflectionBuffer(512, 512) {
 
     reflectionBuffer.addColorTexture(GL_RGB, GL_LINEAR, GL_LINEAR);

@@ -100,7 +100,7 @@ float PlanetGenerator::calculateGrass(const glm::vec3 & unitSphere, VertexCharac
     float noise = 0.5 * (grassNoise.GetValue(unitSphere.x * frequency, unitSphere.y * frequency, unitSphere.z * frequency) + 1);
 
     float steepness = v.maxNeighbor - v.minNeighbor;
-    float rockiness = 0.f; //clamp(steepness, 0.f, 1.f);
+    float rockiness = clamp(steepness, 0.f, 1.f);
 
     // int maxDist = 1 + (int)(30 * abs(noise));
     // float dist = max(0.f, min(v.distToGrass, (float) maxDist + 3) - 3);
@@ -119,7 +119,7 @@ float PlanetGenerator::calculateDeadGrass(const glm::vec3 & unitSphere, VertexCh
 float PlanetGenerator::calculateRock2(const glm::vec3 & unitSphere, VertexCharacteristics v) {
     if (v.height < ROCK_LEVEL) return 0;
 
-    float noise = planetNoise.GetValue(unitSphere.x, unitSphere.y, unitSphere.z);
+//    float noise = planetNoise.GetValue(unitSphere.x, unitSphere.y, unitSphere.z);
 
     return 1. - clamp<float>(v.maxNeighbor - v.height, 0., 1.);
 }
@@ -141,15 +141,12 @@ void PlanetGenerator::addTextureMaps(Mesh * mesh) {
     unsigned int texOffset = attrs.getOffset({"TEX_BLEND", 4});
     unsigned int yLevelOffset = attrs.getOffset({"Y_LEVEL", 1});
 
-    std::vector<VertexCharacteristics> characteristics(mesh->nrOfVertices, {99999, -99999, 99999});
+    std::vector<VertexCharacteristics> characteristics(mesh->nrOfVertices, {99999, -99999, 99999, 0, 0});
 
     // Calculate attributes with on neighbors 
-    for (int i = 0; i < mesh->nrOfIndices; i += 3)
+    for (unsigned int i = 0; i < mesh->nrOfIndices; i += 3)
     {
         int vertI0 = mesh->indices[i], vertI1 = mesh->indices[i + 1], vertI2 = mesh->indices[i + 2];
-        auto p0 = mesh->get<glm::vec3>(vertI0, posOffset),
-            p1 = mesh->get<glm::vec3>(vertI1, posOffset),
-            p2 = mesh->get<glm::vec3>(vertI2, posOffset);
 
         auto y0 = mesh->get<float>(vertI0, yLevelOffset),
             y1 = mesh->get<float>(vertI1, yLevelOffset),
@@ -172,7 +169,7 @@ void PlanetGenerator::addTextureMaps(Mesh * mesh) {
         characteristics[vertI1].maxNeighbor = max(characteristics[vertI1].maxNeighbor, maxHeight);
     }
 
-    for (int i = 0; i < mesh->nrOfIndices; i ++) {
+    for (unsigned int i = 0; i < mesh->nrOfIndices; i ++) {
         int vertI = mesh->indices[i];
 
         auto pos = mesh->get<glm::vec3>(vertI, posOffset);
@@ -201,9 +198,9 @@ void PlanetGenerator::generate(Planet *plt)
 
     VertAttributes terrainAttrs;
     unsigned int posOffset = terrainAttrs.add(VertAttributes::POSITION);
-    unsigned int norOffset = terrainAttrs.add(VertAttributes::NORMAL);
+    terrainAttrs.add(VertAttributes::NORMAL);
     unsigned int uvOffset = terrainAttrs.add(VertAttributes::TEX_COORDS);
-    unsigned int tanOffset = terrainAttrs.add(VertAttributes::TANGENT);
+    terrainAttrs.add(VertAttributes::TANGENT);
     unsigned int texOffset = terrainAttrs.add({"TEX_BLEND", 4});
     unsigned int yLevelOffset = terrainAttrs.add({"Y_LEVEL", 1});
 
@@ -227,7 +224,7 @@ void PlanetGenerator::generate(Planet *plt)
     plt->waterMesh = sphere.generate(plt->config.name + "_water", 100, 70, waterAttrs); //sphere.gstd::make_shared<Mesh>(plt->config.name + "_water", nVertices, nIndices, attrs);
     
     const float * vertices = cubesphere.getVertices();
-    const float * normals = cubesphere.getNormals();
+//    const float * normals = cubesphere.getNormals();
     const float * texCords = cubesphere.getTexCoords();
 
     std::vector<vec4> textureMap(nVertices, vec4());

@@ -115,7 +115,7 @@ void VertBuffer::upload()
 void VertBuffer::setAttrPointersAndEnable(VertAttributes &attrs, unsigned int divisor, unsigned int locationOffset)
 {
     GLint offset = 0;
-    for (int i = locationOffset; i < locationOffset + attrs.nrOfAttributes(); i++)
+    for (unsigned int i = locationOffset; i < locationOffset + attrs.nrOfAttributes(); i++)
     {
         auto &attr = attrs.get(i - locationOffset);
         glDisableVertexAttribArray(i);
@@ -166,7 +166,7 @@ GLuint VertBuffer::uploadPerInstanceData(VertData data, GLuint advanceRate)
 {
     bind();
     GLuint id = instanceVbos.size();
-    for (int i = 0; i < instanceVbos.size(); i++) if (instanceVbos[i] == -1) id = i;
+    for (unsigned int i = 0; i < instanceVbos.size(); i++) if (instanceVbos[i] == (GLuint) -1) id = i;
     if (id == instanceVbos.size())
     {
         instanceVbos.emplace_back();
@@ -206,7 +206,7 @@ VertBuffer::~VertBuffer()
     glDeleteBuffers(1, &iboId);
 
     for (auto &id : instanceVbos)
-        if (id != -1) glDeleteBuffers(1, &id);
+        if (id != (GLuint) -1) glDeleteBuffers(1, &id);
 
     if (vaoId == currentlyBoundVao)
         currentlyBoundVao = 0;

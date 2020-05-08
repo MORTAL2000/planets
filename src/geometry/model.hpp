@@ -59,16 +59,16 @@ public:
     void upload();
     void render();
 
-    int current_animation = -1;
-    void set_animation(int num) {
-        if (num >= animations.size()) {
-            throw "Asking for animation that doesn't exist";
-        }
+    // int current_animation = -1;
+    // void set_animation(int num) {
+    //     if (num >= (int) animations.size()) {
+    //         throw "Asking for animation that doesn't exist";
+    //     }
 
-        current_animation = num;
-    }
+    //     current_animation = num;
+    // }
 
-    void update_animation(float time);
+    // void update_animation(float time);
 
 private:
     Assimp::Importer importer;
@@ -83,7 +83,7 @@ private:
     void loadMaterialTextures(SharedMesh mesh, aiMaterial *mat, aiTextureType type, const aiScene * scene, std::string typeName);
     // vector<VertexBoneData> loadBones(const aiMesh* mesh);
 
-    void processAnimation(aiAnimation * animation, const aiScene* scene);
+    // void processAnimation(aiAnimation * animation, const aiScene* scene);
 
     uint find_scaling(float AnimationTime, const aiNodeAnim* pNodeAnim);
     uint find_rotation(float AnimationTime, const aiNodeAnim* pNodeAnim);

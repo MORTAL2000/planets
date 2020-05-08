@@ -39,7 +39,7 @@ void addTangentsToMesh(Mesh *mesh)
     int texOffset = attrs.getOffset(VertAttributes::TEX_COORDS);
     int tanOffset = attrs.getOffset(VertAttributes::TANGENT);
 
-    for (int i = 0; i < mesh->nrOfIndices; i += 3)
+    for (unsigned int i = 0; i < mesh->nrOfIndices; i += 3)
     {
         int vertI0 = mesh->indices[i], vertI1 = mesh->indices[i + 1], vertI2 = mesh->indices[i + 2];
         auto p0 = mesh->get<vec3>(vertI0, posOffset),

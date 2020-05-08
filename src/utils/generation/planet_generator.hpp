@@ -38,12 +38,11 @@ namespace {
     static NoiseLayer MOUNTAINS = {
         3, 0.376, 9.662, 8.120, 4.436, 0.37
     };
-
-    static void ShowDebugWindow(bool * p_open);
 }
 
 class PlanetGenerator {
 private:
+    
     FastNoise planetNoise;
     FastNoise grassNoise;
     FastNoise deadGrassNoise;

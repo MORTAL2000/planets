@@ -161,7 +161,7 @@ SharedTexArray ResourceManager::loadTextureArrayFromDDSFiles(const std::vector<s
     texarray->Max_Level = mipMapCount;
     texarray->Internal_Format = d.format;
 
-    unsigned char * buffers[layerCount];
+    unsigned char ** buffers = new unsigned char *[layerCount];
     for (unsigned int i = 0; i < layerCount; i++) {
         if (datas[i].width != width || datas[i].height != height || datas[i].format != d.format || datas[i].mipMapCount != mipMapCount)
             throw "TextureArray: DDS files cannot have different dimensions/formats/mipmap-levels";
@@ -170,6 +170,8 @@ SharedTexArray ResourceManager::loadTextureArrayFromDDSFiles(const std::vector<s
     }
 
     texarray->generate(width, height, layerCount, buffers);
+    
+    delete [] buffers;
 
     return SharedTexArray(texarray);
 }

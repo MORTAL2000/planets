@@ -30,10 +30,8 @@ SharedMesh Mesh::getQuad()
 
 Mesh::Mesh(const std::string& name, unsigned int nrOfVertices, unsigned int nrOfIndices, VertAttributes attributes)
 
-    : name(name), nrOfVertices(nrOfVertices), nrOfIndices(nrOfIndices),
-
-      VertData(attributes, std::vector<u_char>(nrOfVertices * attributes.getVertSize())),
-      indices(nrOfIndices)
+    : VertData(attributes, std::vector<u_char>(nrOfVertices * attributes.getVertSize())),
+        name(name), indices(nrOfIndices), nrOfVertices(nrOfVertices), nrOfIndices(nrOfIndices) 
 {
     std::cout << "Mesh created: " << name << std::endl;
 }

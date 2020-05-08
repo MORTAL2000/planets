@@ -14,7 +14,7 @@
 
 
 PlanetCamera::PlanetCamera(Camera *cam, Planet *plt)
-    : camera(cam), plt(plt)
+    : plt(plt), camera(cam)
 {
 }
 
@@ -23,8 +23,6 @@ const int DRAG_BUTTON = GLFW_MOUSE_BUTTON_LEFT;
 void PlanetCamera::update(float dt)
 {
     auto prevPos = camera->position;
-
-    ImGuiIO& io = ImGui::GetIO();
 
     if (KeyInput::pressed(GLFW_KEY_W))
         camera->position += camera->direction * glm::vec3(dt * speedMultiplier);
@@ -186,7 +184,7 @@ void PlanetCamera::updateHorizonDistance()
 void PlanetCamera::planetCulling()
 {
     updateHorizonDistance();
-    int nrInView = 0;
+//    int nrInView = 0;
     // for (Island *isl : plt->islands)
     // {
     //     isl->isInView = false;

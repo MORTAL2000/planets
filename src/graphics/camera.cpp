@@ -14,10 +14,11 @@
 
 
 Camera::Camera(float z_near, float z_far, float viewportWidth, float viewportHeight, float fov):
-    z_near(z_near), z_far(z_far), viewportWidth(viewportWidth), viewportHeight(viewportHeight), fov(fov),
     direction(glm::vec3(0, 0, -1)),
     up(glm::vec3(0, 1, 0)),
-    right(glm::vec3(1, 0, 0))
+    right(glm::vec3(1, 0, 0)),
+    z_near(z_near), z_far(z_far), viewportWidth(viewportWidth), viewportHeight(viewportHeight),
+    fov(fov)
 {
 }
 

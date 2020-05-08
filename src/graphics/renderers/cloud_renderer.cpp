@@ -10,8 +10,8 @@
 const int nrOfSpawnpoints = 30, particlesPerOffset = 6;
 
 CloudRenderer::CloudRenderer(Planet *planet):   
-    planet(planet), 
-    quad(new Mesh("cloud_quad", 4, 6, Mesh::getQuad()->attributes))
+    quad(new Mesh("cloud_quad", 4, 6, Mesh::getQuad()->attributes)),
+    planet(planet)
 {
     ResourceManager::LoadShader("clouds.vert", "clouds.frag", "clouds");
     noiseTex = ResourceManager::LoadTexture("textures/noise.dds", "noise");

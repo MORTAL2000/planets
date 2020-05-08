@@ -46,7 +46,7 @@ Sphere::Sphere(float radius, glm::vec3 center) : radius(radius), center(center)
 //     return true;
 // }
 
-SharedMesh Sphere::generate(const std::string &meshName, int sectorCount, int stackCount, VertAttributes &attrs)
+SharedMesh Sphere::generate(const std::string &meshName, unsigned int sectorCount, unsigned int stackCount, VertAttributes &attrs)
 {
     int nrOfVerts = (sectorCount + 1) * (stackCount + 1);
     SharedMesh mesh = SharedMesh(new Mesh(meshName, nrOfVerts, (sectorCount * (stackCount - 1)) * 6, attrs));
@@ -65,7 +65,7 @@ SharedMesh Sphere::generate(const std::string &meshName, int sectorCount, int st
     float sectorAngle, stackAngle;
 
     int vertI = 0;
-    for(int i = 0; i <= stackCount; ++i)
+    for(unsigned int i = 0; i <= stackCount; ++i)
     {
         stackAngle = M_PI / 2.f - i * stackStep;        // starting from pi/2 to -pi/2
         xy = radius * cosf(stackAngle);             // r * cos(u)
@@ -77,7 +77,7 @@ SharedMesh Sphere::generate(const std::string &meshName, int sectorCount, int st
         ty = 0.f;
         tz = sinf(lon * M_PI / 180.0f - .5 * M_PI);
 
-        for(int j = 0; j <= sectorCount; ++j)
+        for(unsigned int j = 0; j <= sectorCount; ++j)
         {
             sectorAngle = j * sectorStep;           // starting from 0 to 2pi
 
@@ -109,13 +109,13 @@ SharedMesh Sphere::generate(const std::string &meshName, int sectorCount, int st
     //  k2--k2+1
     unsigned int k1, k2;
 
-    int i = 0;
-    for(int x = 0; x < stackCount; ++x)
+    unsigned int i = 0;
+    for(unsigned int x = 0; x < stackCount; ++x)
     {
         k1 = x * (sectorCount + 1);     // beginning of current stack
         k2 = k1 + sectorCount + 1;      // beginning of next stack
 
-        for(int y = 0; y < sectorCount; ++y, ++k1, ++k2)
+        for(unsigned int y = 0; y < sectorCount; ++y, ++k1, ++k2)
         {
             // 2 triangles per sector excluding 1st and last stacks
             if(x != 0)

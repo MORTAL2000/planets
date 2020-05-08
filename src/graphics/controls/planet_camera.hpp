@@ -33,7 +33,7 @@ class PlanetCamera
     Planet *plt;
     Camera *camera;
 
-    float dragLon = 0, dragLat = 0, dragUpdateAccumulator = 0, afterDragTimer;
+    float dragLon = 0, dragLat = 0, afterDragTimer;
     bool accurateDraggingStarted = false;
 
     std::queue<glm::vec2> dragHistory;

@@ -20,5 +20,5 @@ class Sphere {
          * Define what attributes the vertices should have in 'attrs'.
          * POSITION is required, NORMAL, TANGENT and TEX_COORDS are supported.
          **/
-        SharedMesh generate(const std::string &meshName, int segments, int rings, VertAttributes &attrs);
+        SharedMesh generate(const std::string &meshName, unsigned int sectorCount, unsigned int stackCount, VertAttributes &attrs);
 };

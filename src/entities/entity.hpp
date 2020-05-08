@@ -41,7 +41,7 @@ public:
 
     virtual std::vector<orientation_state> get_current_path();
     virtual glm::vec3& get_direction() { return _direction; }
-    virtual const glm::vec3 & get_velocity() { return _speed * _direction; }
+    virtual const glm::vec3 get_velocity() { return _speed * _direction; }
     float get_radius();
 
     void drag(const glm::vec3 & origin, const glm::vec3 & direction);

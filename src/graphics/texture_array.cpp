@@ -28,11 +28,11 @@
 TextureArray::TextureArray(): 
     width(0), 
     height(0), 
-    layers(0), 
-    Max_Level(1000),
+    layers(0),
+    Texture_Type(GL_UNSIGNED_BYTE),
     Image_Format(GL_RGB),
-    Internal_Format(GL_RGB), 
-    Texture_Type(GL_UNSIGNED_BYTE)
+    Internal_Format(GL_RGB),
+    Max_Level(1000)
 {
     glGenTextures(1, &this->id);
     std::cout << "TextureArray id: " << id << " created\n";

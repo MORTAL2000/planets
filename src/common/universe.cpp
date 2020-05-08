@@ -11,7 +11,7 @@
 #include "utils/generation/planet_generator.hpp"
 #include "graphics/input/key_input.hpp"
 
-const float EARTH_RADIUS = 150, ATMOSPHERE_RADIUS = 198;
+const float EARTH_RADIUS = 150; //ATMOSPHERE_RADIUS = 198;
 
 static PlanetConfig getEarthConfig() {
     PlanetConfig config;
@@ -22,18 +22,7 @@ static PlanetConfig getEarthConfig() {
     return config;
 }
 
-Universe::Universe(const char *loadFilePath): earth(getEarthConfig()) {
-    // if (loadFilePath)
-    // {
-    //     auto earthBin = File::readBinary(loadFilePath);
-    //     earth.fromBinary(earthBin);
-    // } else {
-        // generateEarth(&earth);
-    //     std::vector<uint8> data;
-    //     earth.toBinary(data);
-    //     File::writeBinary("level.save", data);
-    // }
-
+Universe::Universe(): earth(getEarthConfig()) {
     generator.generate(&earth);
 }
 

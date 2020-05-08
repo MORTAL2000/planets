@@ -9,11 +9,11 @@
 
 Texture::Texture()
     : width(0), 
-    height(0), 
-    Texture_Type(GL_UNSIGNED_BYTE), 
-    Internal_Format(GL_RGB), 
-    Max_Level(1000), 
-    Image_Format(GL_RGB), 
+    height(0),
+    Internal_Format(GL_RGB),
+    Image_Format(GL_RGB),
+    Texture_Type(GL_UNSIGNED_BYTE),
+    Max_Level(1000),
     Wrap_S(GL_REPEAT), 
     Wrap_T(GL_REPEAT), 
     Filter_Min(GL_LINEAR_MIPMAP_LINEAR), 

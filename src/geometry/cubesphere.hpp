@@ -66,7 +66,6 @@ public:
     const float* getNormalsForFace(int faceId) const;
     const float* getTexCoordsForFace(int faceId) const;
     const float* getInterleavedVerticesForFace(int faceId) const;
-    const unsigned int* getIndicesForFace(int faceId) const { return indices.data(); }  // always the begining of index array
 
     // draw in VertexArray mode
     void draw() const;
