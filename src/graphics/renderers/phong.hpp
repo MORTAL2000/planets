@@ -5,6 +5,7 @@
 #include <glm/mat4x4.hpp>
 
 // Local Headers
+#include "renderer.hpp"
 #include "graphics/shader.hpp"
 #include "graphics/renderable.hpp"
 
@@ -18,7 +19,7 @@ struct Light {
     : position(position_), intensities(intensities_), attenuation(attenuation_), ambientCoefficient(ambientCoefficient) {}
 };
 
-class PhongRenderer
+class PhongRenderer: public Renderer
 {
     private:
         // Shader shader;

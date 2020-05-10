@@ -10,7 +10,8 @@ class Universe {
 
         PlanetGenerator generator;
 
-        std::vector<OrbitalMass *> planets;
+        std::vector<Planet *> planets;
+        std::vector<Renderable *> renderables;
         OrbitalMass * center;
 
         bool debugOpen = false;
@@ -24,5 +25,7 @@ class Universe {
         void update(float dt);
 
         glm::vec3 calculateSunDirection(float lat, float lon, float zoom);
-        Planet * getPlanet();
+
+        std::vector<Planet*> getPlanets();
+        std::vector<Renderable*> getRenderables();
 };

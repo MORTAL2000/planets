@@ -7,6 +7,7 @@
 #include "utils/resource_manager.hpp"
 
 #include "graphics/gl_error.hpp"
+#include "render_type.hpp"
 
 TerrainRenderer::TerrainRenderer() {
     Shader shader = ResourceManager::LoadShader("terrain.vert", "terrain.frag", "terrain");
@@ -47,7 +48,13 @@ void TerrainRenderer::render() {
 
     Universe universe = Globals::scene->getUniverse();
 
-    universe.getPlanet()->terrainMesh->render();
+//    universe.getPlanet()->terrainMesh->render();
+
+    draw_objects(universe.getRenderables(), glm::mat4(1.f), shader, RenderType::Terrain, true);
+    
+    // for (auto &planet : universe.getRenderables()) {
+    //     planet->render(RenderType::Terrain);
+    // }
 
     // Draw grids
     // for (auto isl : universe.getPlanet()->land)
@@ -62,10 +69,9 @@ void TerrainRenderer::applyUniforms(Shader & shader) {
     
     Camera camera = Globals::scene->getCamera();
     // Universe universe = Globals::scene->getUniverse();
-    glm::mat4 mvp = camera.combined;
 
     // Using an identity model for now
-    glUniformMatrix4fv(shader.uniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
+    // glUniformMatrix4fv(shader.uniform("viewProjection"), 1, GL_FALSE, &camera.combined[0][0]);
     
     // glUniform1f(shader.uniform("time"), universe.getTime());
     // glUniform2f(shader.uniform("scrSize"), WindowSize::widthPixels, WindowSize::heightPixels);

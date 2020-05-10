@@ -1468,27 +1468,6 @@ function createShip() {
 	}
 }
 
-function fixLoadingScreens() { // This corrects the positions of the loading screens - if it's in 3D mode
-
-	// Add a thing that halves the width of all interface modules
-	$(".sideBar").addClass("halfWidth");
-
-	// This is a setting that determines how much the 3D display "pops" out of the screen
-	var disparity = "24.5%"
-
-	// Move the original (left) interface modules into the correct position
-	document.getElementById("bootScreen").style.left = "-" + disparity;
-	document.getElementById("loadingScreen").style.left = "-" + disparity;
-	document.getElementById("smallLoadingScreen").style.left = "calc(" + disparity + " - 125px)"
-	document.getElementById("caption").style.left = "-" + disparity;
-
-	// Move the auxillary (right) interface modules into the correct position
-	document.getElementById("bootScreenAux").style.right = "-" + disparity;
-	document.getElementById("loadingScreenAux").style.right = "-" + disparity;
-	document.getElementById("smallLoadingScreenAux").style.right = "calc(" + disparity + " - 125px)"
-	document.getElementById("captionAux").style.right = "-" + disparity;
-}
-
 function loadAllMeshes() { // If running in HD mode, load everything as the program starts
 
 	// Go through every planet
@@ -1505,253 +1484,6 @@ function loadAllMeshes() { // If running in HD mode, load everything as the prog
 }
 
 // Full System Rendering
-
-function createRings() { // Create planetary rings - these are specific, but are added and managed in a standard way
-
-	// Create Saturn ring
-	if (planets["saturn"]) {
-
-		// Set inner and outer ring radii in AU
-		var innerRingRadius = 0.000447867337;
-		var outerRingRadius = 0.00094921137;
-
-		// Create ring geometry and materials
-		var geometry = new THREE.RingGeometry(innerRingRadius * totalScale, outerRingRadius * totalScale, geoRes, geoRes, 0, Math.PI * 2, true);
-		var material = new THREE.MeshBasicMaterial({
-			map: textureLoader.load(baseURL + 'assets/special/saturnringmap.jpg'),
-			color: 0x777777,
-			wireframe: false,
-			side: THREE.DoubleSide,
-			opacity: 0,
-			transparent: true,
-			alphaMap: textureLoader.load(baseURL + 'assets/special/satringtrans.png'),
-
-		});
-
-		var settings = {
-			map: textureLoader.load(baseURL + 'assets/special/saturnringmap.jpg'),
-			color: white,
-			wireframe: false,
-			side: THREE.DoubleSide,
-			opacity: 1,
-			transparent: true,
-			alphaMap: textureLoader.load(baseURL + 'assets/special/satringtrans.png'),
-		}
-		var shadowMaterial
-
-		if (userOnPhone) {
-			shadowMaterial = new THREE.MeshLambertMaterial(settings);
-		}
-		else {
-			settings.specular = black
-			settings.shininess = 0
-			shadowMaterial = new THREE.MeshPhongMaterial(settings);
-		}
-
-		// Create the actual rings
-		var saturnRing = new THREE.Mesh(geometry, material);
-		var saturnRingShadow = new THREE.Mesh(geometry, shadowMaterial);
-
-		// Set the ring's rotation axis
-		var axis = new THREE.Vector3(0, 0, 1).normalize();
-
-		// Set shadow properties - no shadow casting because TJS does not consider transparency of a material with shadows (ring shadows are solid blocks)
-		saturnRing.castShadow = false;
-		saturnRing.receiveShadow = true;
-		saturnRingShadow.castShadow = false;
-		saturnRingShadow.receiveShadow = true;
-
-		// Create a group
-		var group = new THREE.Group();
-		group.add(saturnRing)
-		group.add(saturnRingShadow)
-
-		// Set rotation properties
-		var alignVec = threeVector(planets["saturn"]["axialTilt"]).clone().normalize()
-		saturnRing.quaternion.setFromUnitVectors(axis, alignVec);
-		saturnRingShadow.quaternion.setFromUnitVectors(axis, alignVec);
-
-		// Add the actual rings
-		planets["saturn"]["ringMesh"] = group;
-		scene.add(group);
-	}
-
-	// Create Uranus ring
-	if (planets["uranus"]) {
-
-		// Set inner and outer ring radii in AU
-		var innerRingRadius = 0.00025430175;
-		var outerRingRadius = 0.000339069;
-
-		// Create the geometry
-		geometry = new THREE.RingGeometry(innerRingRadius * totalScale, outerRingRadius * totalScale, geoRes, geoRes, 0, Math.PI * 2, true);
-
-		// Create the materials
-		material = new THREE.MeshBasicMaterial({
-			map: textureLoader.load(baseURL + 'assets/special/uranusringmap.jpg'),
-			color: 0x777777,
-			wireframe: false,
-			side: THREE.DoubleSide,
-			opacity: 1,
-			transparent: true,
-			alphaMap: textureLoader.load(baseURL + 'assets/special/uranusringtrans.jpg'),
-		});
-
-		var settings = {
-			map: textureLoader.load(baseURL + 'assets/special/uranusringmap.jpg'),
-			color: white,
-			wireframe: false,
-			side: THREE.DoubleSide,
-			opacity: 1,
-			transparent: true,
-			alphaMap: textureLoader.load(baseURL + 'assets/special/uranusringtrans.jpg'),
-		}
-		var shadowMaterial
-
-		if (userOnPhone) {
-			shadowMaterial = new THREE.MeshLambertMaterial(settings);
-		}
-		else {
-			settings.specular = black
-			settings.shininess = 0
-			shadowMaterial = new THREE.MeshPhongMaterial(settings);
-		}
-
-		// Create the meshes
-		var uranusRing = new THREE.Mesh(geometry, material);
-		var uranusRingShadow = new THREE.Mesh(geometry, shadowMaterial);
-
-		// Create a group
-		group = new THREE.Group();
-		group.add(uranusRing)
-		group.add(uranusRingShadow)
-
-		// Set shadow properties
-		uranusRingShadow.castShadow = false;
-		uranusRingShadow.receiveShadow = true;
-
-		// Add the group to the program
-		planets["uranus"]["ringMesh"] = group;
-		scene.add(group);
-
-		// Set rings rotation
-		alignVec = threeVector(planets["uranus"]["axialTilt"]).clone().normalize()
-		uranusRing.quaternion.setFromUnitVectors(axis, alignVec);
-		uranusRingShadow.quaternion.setFromUnitVectors(axis, alignVec);
-	}
-
-	// Create the "deimos ring", which only shows up if the Expanse is toggled
-	if (planets["deimos"] && !webVRDisp) {
-
-		// Create geometry and mesh
-		geometry = new THREE.RingGeometry(planets["deimos"]["a"] * 0.95 * totalScale, planets["deimos"]["a"] * 1.05 * totalScale, geoRes);
-		var deimosRing = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({
-			wireframe: false,
-			side: THREE.DoubleSide,
-			transparent: true,
-			color: 0x888888,
-			opacity: 0.1
-		}));
-
-		// Calculate the axial tilt, and rotate the deimos ring to match the orbit of Deimos
-		var axialTilt = planets["deimos"]["orbitalAxis"];
-		axis = new THREE.Vector3(0, 0, 1).normalize();
-		alignVec = threeVector(axialTilt).clone().normalize()
-		deimosRing.quaternion.setFromUnitVectors(axis, alignVec);
-
-		// Conrol visibility - not until The Expanse
-		deimosRing.visible = false;
-
-		// Name it for identification
-		deimosRing.name = "Deimos Rubble"
-
-		// Set tooltip tracking
-		deimosRing.trackMouse = true
-
-		// Add the ring to the scene
-		scene.add(deimosRing);
-		planets["mars"]["ringMesh"] = deimosRing;
-	}
-
-	// Create the Monolith on Iapetus, which is categorised as a ring
-	if (planets["iapetus"] && !webVRDisp) {
-
-		// Define the scale in relation to Iapetus
-		var monScale = 0.1 * planets["iapetus"]["r"];
-
-		// Create geometry and mesh
-		var scaling = threeVector([1 * monScale * totalScale, 4 * totalScale * monScale, 9 * totalScale * monScale])
-		geometry = new THREE.BoxGeometry(scaling.x, scaling.y, scaling.z);
-		var theMonolith = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({
-			color: 0x0A0A0A,
-			side: THREE.DoubleSide,
-
-		}));
-
-		// Move the monolith to the correct position
-		var translateAmount = threeVector([axialTilt[0], axialTilt[1], (planets["iapetus"]["r"] + 8.5 * monScale / 2) * totalScale])
-		geometry.translate(translateAmount.x, translateAmount.y, translateAmount.z);
-
-		// Add the monlith
-		scene.add(theMonolith);
-		planets["iapetus"]["ringMesh"] = theMonolith;
-	}
-}
-
-function createBelts() { // Create asteroid belts
-
-	// Create asteroid belt
-	var geometry = new THREE.RingGeometry(2.1 * totalScale, 3.2 * totalScale, geoRes);
-	belt = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({
-		color: 0x555555,
-		wireframe: false,
-		side: THREE.DoubleSide,
-		transparent: true,
-		opacity: 0.3
-	}));
-
-	// Add asteroid belt
-	belt.position.set(0, 0, 0);
-	scene.add(belt);
-
-	// Create kupier belt
-	geometry = new THREE.RingGeometry(30 * totalScale, 50 * totalScale, geoRes);
-	kuiper = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({
-		color: 0x333333,
-		wireframe: false,
-		side: THREE.DoubleSide,
-		transparent: true,
-		opacity: 0.3
-	}));
-
-	// Add Kuiper belt
-	kuiper.position.set(0, 0, 0);
-	scene.add(kuiper);
-
-	// Set shadow properties
-	belt.castShadow = false;
-	kuiper.castShadow = false;
-
-	// Hide the belts until shown through guide
-	belt.visible = false;
-	kuiper.visible = false;
-
-	// Set the tooltip tracking of the two belts
-	belt.trackMouse = true
-	kuiper.trackMouse = true
-
-	// Name them
-	belt.name = "Asteroid Belt";
-	kuiper.name = "Kuiper Belt";
-
-	// Set the correct rotations
-	var axis = camera.up
-	var alignVec = threeVector([0, 0, 1]).normalize();
-	belt.quaternion.setFromUnitVectors(axis, alignVec);
-	kuiper.quaternion.setFromUnitVectors(axis, alignVec);
-
-
-}
 
 function createGuides() { // Create Vernal equinox line
 	// Create initial geometry
@@ -1873,10 +1605,10 @@ function createOrbit(name, startDegree, endDegree) { // Create the ThreeJS geome
 	// Initialise variables
 	var geometry = new THREE.Geometry();
 	var vertexes = [];
-	var degree = endDegree * orbitResolution;
+	var degree = endDegree * ORBIT_RESOLUTION;
 
 	// Get the correct initial vertex
-	if (degree < 360 * orbitResolution) {
+	if (degree < 360 * ORBIT_RESOLUTION) {
 		geometry.vertices.push(threeVector(orbitalPositions[name][degree]));
 	}
 	else {
@@ -1884,7 +1616,7 @@ function createOrbit(name, startDegree, endDegree) { // Create the ThreeJS geome
 	}
 
 	// Iterate through all orbit points between given bounds and add it to the vertexes
-	while (degree > startDegree * orbitResolution) {
+	while (degree > startDegree * ORBIT_RESOLUTION) {
 		degree -= 1;
 		var orbitalPosition = orbitalPositions[name][degree];
 
@@ -4676,7 +4408,7 @@ function findPlanetLocation(name, time) { // Deliver a planet location given the
 	}
 
 	// Start from the epoch position
-	var nextDegree = (Math.round((L) * orbitResolution)) % (360 * orbitResolution);
+	var nextDegree = (Math.round((L) * ORBIT_RESOLUTION)) % (360 * ORBIT_RESOLUTION);
 
 	// Find the point where it is different
 	var diffPoint = orbitalTimes[name][0];
@@ -4684,7 +4416,7 @@ function findPlanetLocation(name, time) { // Deliver a planet location given the
 	// Set the boundaries
 	var lowBound = 0;
 	var midBound = nextDegree;
-	var highBound = 360 * orbitResolution - 1;
+	var highBound = 360 * ORBIT_RESOLUTION - 1;
 
 	// Find which of the two sections the value is in - and set bounds
 	if (remainder > diffPoint) {
@@ -4717,7 +4449,7 @@ function findPlanetLocation(name, time) { // Deliver a planet location given the
 	nextDegree = highBound;
 
 	// Find out the previous position
-	var previousDegree = (nextDegree + 360 * orbitResolution - 1) % (360 * orbitResolution);
+	var previousDegree = (nextDegree + 360 * ORBIT_RESOLUTION - 1) % (360 * ORBIT_RESOLUTION);
 	var previousArray = orbitalPositions[name][previousDegree];
 
 	// Move it between positions to ensure smooth animation - this is rather than jerking it from position to position
@@ -4728,7 +4460,7 @@ function findPlanetLocation(name, time) { // Deliver a planet location given the
 
 	// Save the current position
 	if (name != "sun") {
-		currentDegrees[name] = (previousDegree + percentageAlong) / orbitResolution;
+		currentDegrees[name] = (previousDegree + percentageAlong) / ORBIT_RESOLUTION;
 	}
 
 	// Find the next position
@@ -4817,24 +4549,24 @@ function findPlanetDegree(name, position) { // This entire thing is reverse-deri
 	// Find final degree
 	var degree = -degreesFromAN - loAN
 
-	return (360 - degree) % 360 - (1 / orbitResolution)
+	return (360 - degree) % 360 - (1 / ORBIT_RESOLUTION)
 }
 
 function findVelocity(name, time) { // Return velocity at a given time of a planet
 
 	// Find position and then the degree to match with other knowledge
 	var position = findPlanetLocation(name, time);
-	var degree = Math.round((360 + vectorToAngle(position)) * orbitResolution) % (360 * orbitResolution);
+	var degree = Math.round((360 + vectorToAngle(position)) * ORBIT_RESOLUTION) % (360 * ORBIT_RESOLUTION);
 
-	var newDegree = Math.round(findPlanetDegree(name, position) * orbitResolution)
+	var newDegree = Math.round(findPlanetDegree(name, position) * ORBIT_RESOLUTION)
 	if (!isNaN(newDegree)) {
-		degree = (360 * orbitResolution + newDegree) % (360 * orbitResolution);
+		degree = (360 * ORBIT_RESOLUTION + newDegree) % (360 * ORBIT_RESOLUTION);
 	}
 
 	// Find the infintesimal change in distance and time
-	var deltaTime = orbitalTimes[name][(degree + 1) % (360 * orbitResolution)] - orbitalTimes[name][degree];
+	var deltaTime = orbitalTimes[name][(degree + 1) % (360 * ORBIT_RESOLUTION)] - orbitalTimes[name][degree];
 	//deltaTime = findPeriod(planets[name].a, planets[name].center)
-	var deltaDist = subVec(orbitalPositions[name][(degree + 1) % (360 * orbitResolution)], orbitalPositions[name][degree]);
+	var deltaDist = subVec(orbitalPositions[name][(degree + 1) % (360 * ORBIT_RESOLUTION)], orbitalPositions[name][degree]);
 
 	// Velocity = distance / time, except to find a vector velocity, use a vector distance
 	var velocityVec = multiplyVec((1 / deltaTime), deltaDist);
@@ -4855,8 +4587,8 @@ function generateOrbitalCoords(name) { // Iterate through and calculate all orbi
 	var degree = 360;
 	var coords = [];
 
-	while (degree > 0) { // Iterate through every one of the 360 * orbitResolution points and add to array
-		degree -= 1 / orbitResolution;
+	while (degree > 0) { // Iterate through every one of the 360 * ORBIT_RESOLUTION points and add to array
+		degree -= 1 / ORBIT_RESOLUTION;
 		var array = calculateOrbitalPositionVector(name, degree);
 		coords.push(array);
 	}
@@ -4875,7 +4607,7 @@ function generateOrbitalTimes(name) { // Calculate where the planet should be at
 	gravitationalParameter = M3S2toAU3Y2(gravitationalParameter);
 
 	// The inital degree starts at its position at epoch - because the time is zero at 0 remainer time
-	var degree = (Math.round((L) * orbitResolution)) % (360 * orbitResolution);
+	var degree = (Math.round((L) * ORBIT_RESOLUTION)) % (360 * ORBIT_RESOLUTION);
 
 	// Initialise storage variables
 	orbitalTimes[name] = {};
@@ -4887,15 +4619,15 @@ function generateOrbitalTimes(name) { // Calculate where the planet should be at
 	var counter = 1;
 
 	// Iterate through each degree and find the time at each
-	while (counter < 360 * orbitResolution) {
+	while (counter < 360 * ORBIT_RESOLUTION) {
 
 		// Move the degree forward
-		degree = ((degree + 1) % (360 * orbitResolution));
-		var currentDegree = (degree) % (360 * orbitResolution);
+		degree = ((degree + 1) % (360 * ORBIT_RESOLUTION));
+		var currentDegree = (degree) % (360 * ORBIT_RESOLUTION);
 
 		// Find the positions, and the distance between
 		var arrayOne = orbitalPositions[name][currentDegree];
-		var arrayTwo = orbitalPositions[name][(currentDegree + 1) % (360 * orbitResolution)];
+		var arrayTwo = orbitalPositions[name][(currentDegree + 1) % (360 * ORBIT_RESOLUTION)];
 		var distance = magnitude(subVec(arrayOne, arrayTwo));
 
 		// Find the velocity at this point
@@ -4918,7 +4650,7 @@ function generateOrbitalTimes(name) { // Calculate where the planet should be at
 	}
 
 	// Finish it off by making the last be the full period
-	degree = (Math.round((L) * orbitResolution) - 1 + 360 * orbitResolution) % (360 * orbitResolution);
+	degree = (Math.round((L) * ORBIT_RESOLUTION) - 1 + 360 * ORBIT_RESOLUTION) % (360 * ORBIT_RESOLUTION);
 	orbitalTimes[name][degree] = findPeriod(a, center);
 }
 
@@ -6703,7 +6435,7 @@ function calculateShipCoords(shipParams) { // Calculate the ship's coordinates
 	var degree = 360;
 	var coords = [];
 	while (degree > 0) {
-		degree -= 1 / orbitResolution;
+		degree -= 1 / ORBIT_RESOLUTION;
 		var array = calculateOrbitalPositionVector("ship", degree);
 
 		coords.push(array);
@@ -7011,7 +6743,7 @@ function drawShipOrbit(positions) { // Return a ThreeJS geometry given the ship'
 	var vertexes = [];
 
 	// Start the correct number of degrees
-	var degree = 360 * orbitResolution;
+	var degree = 360 * ORBIT_RESOLUTION;
 	while (degree > 0) { // Iterate through all the degree points and add the verticies
 
 		degree -= 1;
@@ -10858,7 +10590,7 @@ function vectorToAngle(vector) { // Find what angle a given vector is at from th
 	}
 
 	// Round it out, ensuring that it is exactly one of the known orbital markers
-	return Math.round(orbitResolution * ((360 + degreesFromOne) % 360)) / orbitResolution;
+	return Math.round(ORBIT_RESOLUTION * ((360 + degreesFromOne) % 360)) / ORBIT_RESOLUTION;
 }
 
 function angleBetweenVectors(vec1, vec2) { // Find the anticlockwise angle between vectors
@@ -11947,7 +11679,7 @@ var cameraNearMultiplier = 0.004
 
 // Resolution Control
 
-var orbitResolution = 2;
+var ORBIT_RESOLUTION = 2;
 var totalScale = Math.round(convertDistance("AU", "M"));
 var geoRes = 128;
 var markerScale = (1 / 10) * (3 / 4);

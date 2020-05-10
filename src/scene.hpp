@@ -21,6 +21,8 @@ class Scene {
         Universe universe;
 
         bool camPlanetMode = true;
+        bool camDebugMode = true;
+        void updateCamera(float dt);
 
         std::vector<Renderable *> _objects;
     public:
@@ -28,11 +30,13 @@ class Scene {
 
         FlyingCamera flyingCamera;
         PlanetCamera planetCamera;
+
+        std::vector<Renderer *> renderers;
         
         ShadowRenderer shadow_renderer;
         UnderwaterRenderer underwater_renderer;
-        TerrainRenderer terrain_renderer;
-        WaterRenderer water_renderer;
+        // TerrainRenderer terrain_renderer;
+        // WaterRenderer water_renderer;
         SpaceRenderer space_renderer;
         PostProcessing post_processing;
         FrameBuffer reflectionBuffer, *sceneBuffer = NULL;

@@ -15,7 +15,7 @@ struct PlanetConfig {
     std::string name;
 
     float radius;
-    glm::vec3 center = glm::vec3(0.f);
+    // glm::vec3 center = glm::vec3(0.f);
     
     // Mesh
     int subdivision = 5; 
@@ -24,7 +24,7 @@ struct PlanetConfig {
     float roughness = 1;
 };
 
-class Planet: public OrbitalMass {
+class Planet: public OrbitalMass, public Renderable {
     private:
         // TerrainFace * faces[6];
     public:
@@ -53,6 +53,8 @@ class Planet: public OrbitalMass {
         void generateOrbitalTimes();
 
         void upload();
+        void render(RenderType type);
+
         glm::vec3 calculatePointOnPlanet(glm::vec3 pointOnUnitSphere);
 
         // Planet Math

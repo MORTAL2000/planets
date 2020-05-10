@@ -6,6 +6,8 @@
 #include "common/universe.hpp"
 #include "utils/resource_manager.hpp"
 
+#include "render_type.hpp"
+
 WaterRenderer::WaterRenderer() {
     Shader shader = ResourceManager::LoadShader("water.vert", "water.frag", "water");
     check_gl_error();
@@ -22,7 +24,8 @@ void WaterRenderer::render() {
 
     Universe universe = Globals::scene->getUniverse();
 
-    universe.getPlanet()->waterMesh->render();
+    // We don't need to update the models since the terrain renderer will already have done that
+    draw_objects(universe.getRenderables(), glm::mat4(1.f), shader, RenderType::Water, false);
 }
 
 void WaterRenderer::applyUniforms(Shader & shader) {
@@ -30,9 +33,7 @@ void WaterRenderer::applyUniforms(Shader & shader) {
     Camera camera = Globals::scene->getCamera();
     Universe universe = Globals::scene->getUniverse();
 
-    glm::mat4 mvp = camera.combined;
-
-    glUniformMatrix4fv(shader.uniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
+    // glUniformMatrix4fv(shader.uniform("viewProjection"), 1, GL_FALSE, &camera.combined[0][0]);
     glUniform1f(shader.uniform("time"), universe.getTime());
     glUniform2f(shader.uniform("scrSize"), WindowSize::widthPixels, WindowSize::heightPixels);
     glUniform3f(shader.uniform("camPos"), camera.position.x, camera.position.y, camera.position.z);

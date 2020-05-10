@@ -32,7 +32,7 @@ struct Animation {
     double duration;
 };
 
-class Model : public Renderable
+class Model
 {
 public:
     // std::map<string,uint> m_BoneMapping;

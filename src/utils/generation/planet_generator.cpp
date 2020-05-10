@@ -234,8 +234,8 @@ void PlanetGenerator::generate(Planet *plt)
         
 
         glm::vec3 pos(vertices[3 * i], vertices[3 * i + 1], vertices[3 * i + 2]);
-    //        glm::vec3 normal = earth->mesh->get<glm::vec3>(vertI, normOffset);
-        glm::vec3 normal = glm::normalize(pos - config.center);
+        // glm::vec3 normal = earth->mesh->get<glm::vec3>(vertI, normOffset);
+        glm::vec3 normal = glm::normalize(pos);
 
         // Creating noise!
         float terrainHeight = calculateElevation(pos);

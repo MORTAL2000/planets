@@ -16,6 +16,16 @@
 
 const float EARTH_RADIUS = 150; //ATMOSPHERE_RADIUS = 198;
 
+static PlanetConfig getEarth2Config() {
+    PlanetConfig config;
+    config.name = "Earth2";
+    config.radius = EARTH_RADIUS;
+    // config.color = glm::vec3(0.f, 0.f, 1.f);
+    // config.center = glm::vec3(300, 0, 300);
+
+    return config;
+}
+
 static PlanetConfig getEarthConfig() {
     PlanetConfig config;
     config.name = "Earth";
@@ -26,16 +36,21 @@ static PlanetConfig getEarthConfig() {
 }
 
 Universe::Universe() {
-    // center = new OrbitalMass();
-
     Planet * earth = new Planet(getEarthConfig());
-    center = earth;
-
-    Spacecraft * spacecraft = new Spacecraft();
-    spacecraft->center = earth;
-
+    earth->set_position(glm::vec3(0.f));
     generator.generate(earth);
     planets.push_back(earth);
+    renderables.push_back(earth);
+
+    Planet * earth2 = new Planet(getEarth2Config());
+    earth2->set_position(glm::vec3(300.f, 0.f, 300.f));
+    generator.generate(earth2);
+    planets.push_back(earth2);
+    renderables.push_back(earth2);
+
+    center = earth;
+    Spacecraft * spacecraft = new Spacecraft();
+    spacecraft->center = earth;
 
     generateOrbitalData();
 }
@@ -56,15 +71,22 @@ void Universe::update(float dt) {
 
     if (KeyInput::justPressed(GLFW_KEY_R))
     {
-        generator.generate(getPlanet());
+        // generator.generate(getPlanet());
         debugOpen = true;
     }
 
     if (debugOpen) PlanetGenerator::ShowDebugWindow(&debugOpen);
 }
 
-Planet * Universe::getPlanet() {
-    return static_cast<Planet *>(planets[0]);
+// Planet * Universe::getPlanet() {
+//     return static_cast<Planet *>(planets[0]);
+// }
+std::vector<Planet*> Universe::getPlanets() {
+    return planets;
+}
+
+std::vector<Renderable*> Universe::getRenderables() {
+    return renderables;
 }
 
 glm::vec3 Universe::calculateSunDirection(float lat, float lon, float zoom) {

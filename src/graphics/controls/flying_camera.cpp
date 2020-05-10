@@ -54,6 +54,6 @@ void FlyingCamera::update(float dt)
         camera->rotate(MouseInput::deltaMouseY / WindowSize::height * -100 * mouseSensivity, camera->right);
     
     // std::cout << glm::to_string(camera->position) << std::endl;
-    camera->update();
+    // camera->update();
 }
 

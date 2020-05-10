@@ -71,6 +71,7 @@ set(PROJECT_SOURCES
     src/graphics/controls/planet_camera.cpp
     src/graphics/input/key_input.cpp
 	src/graphics/input/mouse_input.cpp
+	src/graphics/renderers/renderer.cpp
 	src/graphics/renderers/lines.cpp
 	src/graphics/renderers/phong.cpp
 	src/graphics/renderers/water_renderer.cpp

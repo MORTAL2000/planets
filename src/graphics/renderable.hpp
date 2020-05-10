@@ -10,8 +10,9 @@
 
 // Local Headers
 #include "graphics/shader.hpp"
-#include "utils/obb.hpp"
+#include "graphics/renderers/render_type.hpp"
 
+#include "utils/obb.hpp"
 
 class Renderable {
 private:
@@ -42,7 +43,7 @@ public:
     Renderable(): Renderable(glm::vec3(1.f, 0.f, 0.f)) {};
 
     virtual void upload() = 0; 
-    virtual void render() = 0;
+    virtual void render(RenderType type) = 0;
 
     virtual void set_parent_matrix(glm::mat4 transformation) { _to_parent_matrix = transformation; }
     virtual glm::mat4& get_to_parent_matrix() { return _to_parent_matrix; }
@@ -89,9 +90,9 @@ public:
     }
 };
 
-class DummyRenderable: public Renderable {
-public:
-    inline void upload() {};
-    inline void render() {};
-    inline void cleanup() {};
-};
+// class DummyRenderable: public Renderable {
+// public:
+//     inline void upload() {};
+//     inline void render() {};
+//     inline void cleanup() {};
+// };

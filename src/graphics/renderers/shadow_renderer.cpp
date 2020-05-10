@@ -3,7 +3,7 @@
 #include <iostream>
 
 ShadowRenderer::ShadowRenderer()
-    : sunCam(0, 300, 150, 150, 90), buffer(2048, 2048)
+    : sunCam(150, 150, 90), buffer(2048, 2048)
 {
     buffer.addDepthTexture(GL_LINEAR, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
@@ -17,7 +17,7 @@ void ShadowRenderer::begin(const Camera &mainCam, const vec3 &sunDir)
     sunCam.position = frustumCenter - sunDir * float(120);
     sunCam.lookAt(frustumCenter);
 
-    sunCam.update();
+    sunCam.calculate(0, 300);
 
     buffer.bind();
     glClear(GL_DEPTH_BUFFER_BIT);

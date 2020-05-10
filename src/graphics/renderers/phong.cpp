@@ -101,35 +101,7 @@ void PhongRenderer::draw(std::vector<Renderable *> objects) {
     // glUniformMatrix4fv( shader.uniform("camera"), 1, GL_FALSE, glm::value_ptr(camera.combined)); // viewing transformation
 
     check_gl_error();
-    render_objects(objects, glm::mat4(1.f), shader);
+    draw_objects(objects, glm::mat4(1.f), shader, RenderType::Terrain, true);
 
     shader.disable();
-}
-
-void PhongRenderer::render_objects(std::vector<Renderable *> renderables, glm::mat4 parent_model, Shader & shader) {
-    if (renderables.size() == 0) return;
-
-    const Camera camera = Globals::scene->getCamera();
-    
-    for(auto t=renderables.begin(); t!=renderables.end(); ++t) {
-        
-        check_gl_error();
-        // default_phong_uniforms();
-
-        (*t)->update_model();
-
-        glm::mat4 model = parent_model * (*t)->get_last_model();
-
-        // glUniformMatrix4fv( shader.uniform("model"), 1, GL_FALSE, glm::value_ptr(model)); // model matrix
-        glUniformMatrix4fv( shader.uniform("MVP"), 1, GL_FALSE, glm::value_ptr(camera.combined * model)); // projection matrix
-        check_gl_error();
-        (*t)->render();
-        check_gl_error();
-
-        // std::cout << "has children " << (*t)->get_children().size() << std::endl;
-        render_objects((*t)->get_children(), model, shader);
-
-        // After all their children have been updated
-        (*t)->update_bounding_box();
-    }
 }

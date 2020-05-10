@@ -11,7 +11,7 @@ class PlanetCamera
 {
   public:
 
-    PlanetCamera(Camera *cam, Planet *plt);
+    PlanetCamera(Camera *cam);
 
 
     void update(float dt);
@@ -24,13 +24,11 @@ class PlanetCamera
   private:
     void dragUpdate();
     glm::vec2 dragVelocity() const;
-
-    void planetCulling();
-
-    void updateHorizonDistance();
+    
     bool cursorToLonLat(const glm::vec3 & rayDir, vec2 &lonLat, float offset) const;
 
-    Planet *plt;
+    float radius = 150;
+    float maxAltitude = 1000;
     Camera *camera;
 
     float dragLon = 0, dragLat = 0, afterDragTimer;

@@ -6,6 +6,8 @@
 #include <optional>
 #include <glm/vec3.hpp>
 
+// Local Headers
+#include "graphics/renderable.hpp"
 #include "common/maneuver.hpp"
 #include "common/orbital_mass.hpp"
 
@@ -15,8 +17,13 @@
 //     float progress = 0.;
 // };
 
-class Spacecraft: public OrbitalMass {
+class Spacecraft: public Renderable, public OrbitalMass {
 //    glm::vec3 relative_velocity;
 
     // std::optional<Mission> mission;
+    public:
+        Spacecraft();
+
+        void upload();
+        void render(RenderType type);
 };

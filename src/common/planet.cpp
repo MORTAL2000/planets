@@ -21,6 +21,17 @@ void Planet::upload()
     VertBuffer::uploadSingleMesh(waterMesh);
 }
 
+void Planet::render(RenderType type)
+{
+    if (type == RenderType::Terrain) {
+        terrainMesh->render();
+    }
+
+    if (type == RenderType::Water) {
+        waterMesh->render();
+    }
+}
+
 float Planet::longitude(float x, float z) const
 {
     return mu::RAD_TO_DEGREES * std::atan2(z, x) + 180.0f;

@@ -13,8 +13,8 @@
 #include "graphics/imgui/imgui.h"
 
 
-PlanetCamera::PlanetCamera(Camera *cam, Planet *plt)
-    : plt(plt), camera(cam)
+PlanetCamera::PlanetCamera(Camera *cam)
+    : camera(cam)
 {
 }
 
@@ -22,8 +22,6 @@ const int DRAG_BUTTON = GLFW_MOUSE_BUTTON_LEFT;
 
 void PlanetCamera::update(float dt)
 {
-    auto prevPos = camera->position;
-
     if (KeyInput::pressed(GLFW_KEY_W))
         camera->position += camera->direction * glm::vec3(dt * speedMultiplier);
 
@@ -92,19 +90,19 @@ void PlanetCamera::update(float dt)
     }
     lon = fmod(lon, 360.f);
     lat = fmax(0.f, fmin(180.f, lat));
-
+ 
     zoom = fmin(.92 , fmax(0., zoom + MouseInput::yScroll * .08));
     float prevActualZoom = actualZoom;
     actualZoom = actualZoom * (1. - dt * 10.) + zoom * dt * 10.;
 
     zoomVelocity = abs(prevActualZoom - actualZoom) / dt;
 
-    camera->position = mu::Y * glm::vec3(5. + 235 * (1. - actualZoom));
+    camera->position = mu::Y * glm::vec3(5. + maxAltitude * (1. - actualZoom));
     camera->position.z += actualZoom * 24.5;
 
     camera->lookAt(mu::ZERO_3, -mu::Z);
 
-    glm::vec3 translateCam = glm::vec3(0, plt->config.radius, 0);
+    glm::vec3 translateCam = glm::vec3(0, radius, 0);
 
     glm::mat4 transform(1);
     transform = glm::rotate(transform, glm::radians(lon), mu::Y);
@@ -115,9 +113,6 @@ void PlanetCamera::update(float dt)
     camera->direction = transform * glm::vec4(camera->direction, 0);
     camera->right = transform * glm::vec4(camera->right, 0);
     camera->up = transform * glm::vec4(camera->up, 0);
-
-    camera->update();
-    if (prevPos != camera->position) planetCulling();
 }
 
 void PlanetCamera::dragUpdate()
@@ -175,44 +170,12 @@ glm::vec2 PlanetCamera::dragVelocity() const
 }
 
 
-void PlanetCamera::updateHorizonDistance()
-{
-    horizonDistance = sqrt(pow(length(camera->position), 2) - pow(plt->config.radius, 2));
-}
-
-
-void PlanetCamera::planetCulling()
-{
-    updateHorizonDistance();
-//    int nrInView = 0;
-    // for (Island *isl : plt->islands)
-    // {
-    //     isl->isInView = false;
-    //     for (int x = 0; x < isl->width; x += 10)
-    //     {
-    //         for (int y = 0; y < isl->height && !isl->isInView; y += 10)
-    //         {
-    //             if (isl->tileAtSeaFloor(x, y)) continue;
-
-    //             vec3 p = isl->vertexPositionsPlanet[isl->xyToVertI(x, y)];
-
-    //             if (length(p - camera->position) > horizonDistance + 15) continue;
-
-    //             bool inView = false;
-    //             camera->project(p, inView);
-    //             if (inView) isl->isInView = true;
-    //         }
-    //     }
-    //     if (isl->isInView) nrInView++;
-    // }
-}
-
 bool PlanetCamera::cursorToLonLat(const glm::vec3 & rayDir, vec2 &lonLat, float offset) const
 {
     glm::vec3 intersection, normal;
-    if (glm::intersectRaySphere(camera->position, rayDir, glm::vec3(0.f), plt->config.radius - offset, intersection, normal)) {
+    if (glm::intersectRaySphere(camera->position, rayDir, glm::vec3(0.f), radius - offset, intersection, normal)) {
         lonLat.x = glm::degrees(std::atan2(intersection.z, intersection.x) + 180.0f);
-        lonLat.y = glm::degrees(glm::acos((intersection.y) / plt->config.radius));
+        lonLat.y = glm::degrees(glm::acos((intersection.y) / radius));
         return true;
     } 
     else return false;

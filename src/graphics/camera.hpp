@@ -8,27 +8,20 @@
 // Local Headers
 #include "utils/math_utils.h"
 
-// namespace AXIS
-// {
-//     const glm::vec3
-//         X = glm::vec3(1, 0, 0),
-//         Y = glm::vec3(0, 1, 0),
-//         Z = glm::vec3(0, 0, 1),
-//         ZERO_3 = glm::vec3(0);
-// }
-class CameraController;
-
 class Camera {
     public:
-        Camera(float z_near, float z_far, float viewportWidth, float viewportHeight, float fov);
+        Camera(float viewportWidth, float viewportHeight, float fov);
+        void ShowDebugWindow(bool* p_open);
         
         glm::vec3 position, direction, up, right;
         glm::mat4 projection, view, combined;
-        float z_near, z_far, viewportWidth, viewportHeight, fov;
+        float viewportWidth, viewportHeight, fov;
+
+        float last_z_near, last_z_far;
 
         glm::vec3 sunDir;
 
-        void update();
+        void calculate(float z_near, float z_far);
     
         glm::vec3 getCursorRayDirection() const;
         glm::vec3 getRayDirection(float viewportX, float viewportY) const;

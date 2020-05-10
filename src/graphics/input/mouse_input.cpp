@@ -97,6 +97,7 @@ static void ShowDebugWindow(bool* p_open)
 
     funcs::ShowKeyValue("mouseX", mouseX);
     funcs::ShowKeyValue("mouseY", mouseY);
+    funcs::ShowKeyValue("yScroll", yScroll);
 
     ImGui::Columns(1);
     ImGui::Separator();
