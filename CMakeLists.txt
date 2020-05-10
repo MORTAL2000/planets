@@ -50,6 +50,7 @@ set(PROJECT_SOURCES
     src/scene.cpp
     src/common/planet.cpp
     src/common/universe.cpp
+    src/common/orbital_mass.cpp
     src/entities/entity.cpp
     src/entities/space_craft.cpp
     src/geometry/mesh.cpp

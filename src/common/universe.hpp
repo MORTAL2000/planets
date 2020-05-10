@@ -1,5 +1,6 @@
 #pragma once
 
+#include "orbital_mass.hpp"
 #include "planet.hpp"
 #include "utils/generation/planet_generator.hpp"
 
@@ -8,8 +9,13 @@ class Universe {
         double time;
 
         PlanetGenerator generator;
-        Planet earth;
+
+        std::vector<OrbitalMass *> planets;
+        OrbitalMass * center;
+
         bool debugOpen = false;
+
+        void generateOrbitalData();
     public:
         Universe();
         

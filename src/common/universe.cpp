@@ -2,10 +2,13 @@
 
 // Standard Headers
 #include <glm/gtx/transform.hpp>
+#include <vector>
 
 // Local Headers
 #include "scene.hpp"
+#include "entities/space_craft.hpp"
 #include "utils/math_utils.h"
+#include "utils/orbital_utils.h"
 #include "utils/file/file.h"
 
 #include "utils/generation/planet_generator.hpp"
@@ -22,8 +25,30 @@ static PlanetConfig getEarthConfig() {
     return config;
 }
 
-Universe::Universe(): earth(getEarthConfig()) {
-    generator.generate(&earth);
+Universe::Universe() {
+    // center = new OrbitalMass();
+
+    Planet * earth = new Planet(getEarthConfig());
+    center = earth;
+
+    Spacecraft * spacecraft = new Spacecraft();
+    spacecraft->center = earth;
+
+    generator.generate(earth);
+    planets.push_back(earth);
+
+    generateOrbitalData();
+}
+
+
+void Universe::generateOrbitalData() {
+    for (size_t i = 0; i < planets.size(); i++)
+    {
+        if (planets[i] == center) continue;
+
+        ou::generateOrbitalCoords(planets[i]);
+        ou::generateOrbitalTimes(planets[i]);
+    }
 }
 
 void Universe::update(float dt) {
@@ -31,7 +56,7 @@ void Universe::update(float dt) {
 
     if (KeyInput::justPressed(GLFW_KEY_R))
     {
-        generator.generate(&earth);
+        generator.generate(getPlanet());
         debugOpen = true;
     }
 
@@ -39,7 +64,7 @@ void Universe::update(float dt) {
 }
 
 Planet * Universe::getPlanet() {
-    return &earth;
+    return static_cast<Planet *>(planets[0]);
 }
 
 glm::vec3 Universe::calculateSunDirection(float lat, float lon, float zoom) {

@@ -17,13 +17,6 @@ Planet::Planet(PlanetConfig config): name(config.name), config(config) {
 
 void Planet::upload()
 {
-    // VertBuffer *buffer = NULL;
-    // for (auto isl : land)
-    // {
-    //     if (!buffer) buffer = VertBuffer::with(isl->terrainMesh->attributes);
-    //     buffer->add(isl->terrainMesh);
-    // }
-    // if (buffer) buffer->upload();
     VertBuffer::uploadSingleMesh(terrainMesh);
     VertBuffer::uploadSingleMesh(waterMesh);
 }

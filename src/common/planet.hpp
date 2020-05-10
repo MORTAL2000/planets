@@ -6,6 +6,7 @@
 #include <glm/vec2.hpp>
 
 // Local Headers
+#include "orbital_mass.hpp"
 #include "geometry/sphere.hpp"
 #include "graphics/renderable.hpp"
 #include "graphics/camera.hpp"
@@ -23,7 +24,7 @@ struct PlanetConfig {
     float roughness = 1;
 };
 
-class Planet {
+class Planet: public OrbitalMass {
     private:
         // TerrainFace * faces[6];
     public:
@@ -47,6 +48,9 @@ class Planet {
 
         Planet(PlanetConfig config);
         PlanetConfig config;
+
+        void generateOrbitalCoords();
+        void generateOrbitalTimes();
 
         void upload();
         glm::vec3 calculatePointOnPlanet(glm::vec3 pointOnUnitSphere);

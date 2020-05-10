@@ -7,15 +7,16 @@
 #include <glm/vec3.hpp>
 
 #include "common/maneuver.hpp"
+#include "common/orbital_mass.hpp"
 
-struct Mission
-{
-    std::vector<Maneuver> maneuvers;
-    float progress = 0.;
-};
+// struct Mission
+// {
+//     std::vector<Maneuver> maneuvers;
+//     float progress = 0.;
+// };
 
-class SpaceCraft {
-    glm::vec3 relative_velocity;
+class Spacecraft: public OrbitalMass {
+//    glm::vec3 relative_velocity;
 
-    std::optional<Mission> mission;
+    // std::optional<Mission> mission;
 };
