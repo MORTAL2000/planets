@@ -15,6 +15,6 @@ class FlyingCamera
 
     FlyingCamera(Camera *cam);
 
-    void update(float dt);
+    CameraState calculate(float dt);
 
 };

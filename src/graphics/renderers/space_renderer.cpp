@@ -115,7 +115,7 @@ void SpaceRenderer::renderSun()
     Globals::scene->sceneBuffer->depthTexture->bind(1);
     glUniform1i(sun_shader.uniform("depthTex"), 1);
 
-    mat4 modelT = glm::translate(glm::translate(glm::mat4(1.f), camera.position), camera.sunDir * vec3(5));
+    mat4 modelT = glm::translate(glm::translate(glm::mat4(1.f), camera.getPosition()), camera.sunDir * vec3(5));
     modelT = glm::rotate(modelT, (float) -atan2(camera.sunDir.z, camera.sunDir.x) + mu::PI * -.5f, mu::Y);
 
     glUniformMatrix4fv(sun_shader.uniform("mvp"), 1, GL_FALSE, &(camera.combined * modelT)[0][0]);
@@ -132,7 +132,7 @@ void SpaceRenderer::renderSun()
     for (int i = 0; i < steps; i++)
     {
         vec3 sd = glm::rotate(camera.sunDir, (float) (.05 * (((float) i - steps * .5) / steps)), mu::Y);
-        vec3 sunPos = camera.position + sd;
+        vec3 sunPos = camera.getPosition() + sd;
 
         bool inViewport = false;
         camera.project(sunPos, inViewport);
@@ -144,7 +144,7 @@ void SpaceRenderer::renderSun()
     lensFlareA = pow(lensFlareA, 2.);
     lensFlareA = lensFlareAlpha = (lensFlareA + lensFlareAlpha) * .5;
 
-    vec2 screenSunPos = camera.project(camera.position + camera.sunDir);
+    vec2 screenSunPos = camera.project(camera.getPosition() + camera.sunDir);
 
     lensFlareA *= 1.4 - length(screenSunPos);
     lensFlareA *= .45;

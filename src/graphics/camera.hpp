@@ -8,12 +8,28 @@
 // Local Headers
 #include "utils/math_utils.h"
 
+static float MAX_SPEED = 500; // 100 unit per second
+static float MAX_ROTATION = 30; // 30 degrees per second
+
+struct CameraState {
+    glm::vec3 position, direction, up, right;
+};
+
 class Camera {
+    private:
+
+        float posT = 0, posTotalTime = 0;
+        // float rotT = 0, rotTotalTime = 0;
+        glm::vec3 targetPosition, lastPosition;
+        glm::quat targetRotation, lastRotation;
+
+        // void setupAnimation(glm::vec3 pos, glm::vec3 dir, glm::vec3 up, glm::vec3 right, float time);
+        // void updateAnimation(float dt);
+        CameraState state;
     public:
         Camera(float viewportWidth, float viewportHeight, float fov);
         void ShowDebugWindow(bool* p_open);
         
-        glm::vec3 position, direction, up, right;
         glm::mat4 projection, view, combined;
         float viewportWidth, viewportHeight, fov;
 
@@ -21,16 +37,21 @@ class Camera {
 
         glm::vec3 sunDir;
 
-        void calculate(float z_near, float z_far);
+        void calculate(float z_near, float z_far, float dt = 0.f);
     
         glm::vec3 getCursorRayDirection() const;
         glm::vec3 getRayDirection(float viewportX, float viewportY) const;
+
+        const CameraState & getState() const { return state; }
+        const glm::vec3 & getPosition() const { return state.position; }
 
         void orientUp(glm::vec3 new_up);
         void lookAt(glm::vec3 target);
         void lookAt(glm::vec3 target, glm::vec3 localYAxis);
         
         void rotate(float degrees, glm::vec3 axis);
+        void moveTo(CameraState newState, bool calculateAnimation = false);
+        void rotateTo(glm::vec3 direction, glm::vec3 right, glm::vec3 up);
 
             /**
      * returns the point in 'normalized device space'.

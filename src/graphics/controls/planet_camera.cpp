@@ -20,26 +20,10 @@ PlanetCamera::PlanetCamera(Camera *cam)
 
 const int DRAG_BUTTON = GLFW_MOUSE_BUTTON_LEFT;
 
-void PlanetCamera::update(float dt)
+CameraState PlanetCamera::calculate(float dt)
 {
-    if (KeyInput::pressed(GLFW_KEY_W))
-        camera->position += camera->direction * glm::vec3(dt * speedMultiplier);
+    if (!planet) throw "No planet assigned";
 
-    if (KeyInput::pressed(GLFW_KEY_S))
-        camera->position += camera->direction * glm::vec3(-dt * speedMultiplier);
-
-    if (KeyInput::pressed(GLFW_KEY_D))
-        camera->position += camera->right * glm::vec3(dt * speedMultiplier);
-
-    if (KeyInput::pressed(GLFW_KEY_A))
-        camera->position += camera->right * glm::vec3(-dt * speedMultiplier);
-
-    if (KeyInput::pressed(GLFW_KEY_Q))
-        camera->rotate(-dt * speedMultiplier, camera->direction);
-
-    if (KeyInput::pressed(GLFW_KEY_E))
-        camera->rotate(dt * speedMultiplier, camera->direction);
-    
     bool startDrag = MouseInput::justPressed(DRAG_BUTTON),
          dragging = MouseInput::pressed(DRAG_BUTTON),
          stoppedDragging = MouseInput::justReleased(DRAG_BUTTON);
@@ -55,28 +39,13 @@ void PlanetCamera::update(float dt)
         if (startDrag) {
             std::queue<glm::vec2> empty;
             std::swap(dragHistory, empty);
+        } else {
+            dragUpdate();
         }
-        
-        dragUpdate();
     }
     else
     {
         accurateDraggingStarted = false;
-        // bool
-        //     up = MouseInput::mouseY < 35,
-        //     down = MouseInput::mouseY > WindowSize::height - 35,
-        //     left = MouseInput::mouseX < 35,
-        //     right = MouseInput::mouseX > WindowSize::width - 35;
-
-        // float moveSpeed = 50. - actualZoom * 20.;
-
-        // if (up) lat -= dt * moveSpeed;
-        // else if (down) lat += dt * moveSpeed;
-
-        // if (left) lon -= dt * moveSpeed;
-        // else if (right) lon += dt * moveSpeed;
-
-        // Slowly drift to an orbit after a timeout
 
         if (stoppedDragging) afterDragTimer = 1;
 
@@ -97,22 +66,39 @@ void PlanetCamera::update(float dt)
 
     zoomVelocity = abs(prevActualZoom - actualZoom) / dt;
 
-    camera->position = mu::Y * glm::vec3(5. + maxAltitude * (1. - actualZoom));
-    camera->position.z += actualZoom * 24.5;
+    float altitude = 5. + maxAltitude * (1. - actualZoom);
+    float atmosphereTilt = 1.f - clamp(altitude / maxAtmosphere, 0.f, 1.f);
 
-    camera->lookAt(mu::ZERO_3, -mu::Z);
-
-    glm::vec3 translateCam = glm::vec3(0, radius, 0);
+    // Target camera details
+    glm::vec3 translateCam = glm::vec3(0, planet->config.radius, 0);
 
     glm::mat4 transform(1);
     transform = glm::rotate(transform, glm::radians(lon), mu::Y);
     transform = glm::rotate(transform, glm::radians(lat), mu::X);
     transform = glm::translate(transform, translateCam);
 
-    camera->position = transform * glm::vec4(camera->position, 1);
-    camera->direction = transform * glm::vec4(camera->direction, 0);
-    camera->right = transform * glm::vec4(camera->right, 0);
-    camera->up = transform * glm::vec4(camera->up, 0);
+    glm::vec3 position = altitude * glm::normalize(glm::vec3(0.f, 1.f, atmosphereTilt));
+    glm::vec3 direction = glm::normalize(mu::ZERO_3 - position);
+    glm::vec3 right = glm::normalize(glm::cross(direction, -mu::Z));
+    glm::vec3 up = glm::normalize(glm::cross(right, direction)); 
+
+    CameraState state;
+    state.position = planet->get_position() + glm::vec3(transform * glm::vec4(position, 1));
+
+    state.direction = transform * glm::vec4(direction, 0);
+    state.right = transform * glm::vec4(right, 0); 
+    state.up = transform * glm::vec4(up, 0);
+
+    return state;
+
+    // camera->rotate(lon, mu::Y);
+    // camera->rotate(lat, mu::X);
+
+    // camera->setupAnimation(transform * glm::vec4(position, 1), 
+    //     transform * glm::vec4(direction, 0), 
+    //     transform * glm::vec4(right, 0), 
+    //     transform * glm::vec4(up, 0), 
+    //     dt);
 }
 
 void PlanetCamera::dragUpdate()
@@ -169,11 +155,12 @@ glm::vec2 PlanetCamera::dragVelocity() const
     return Planet::deltaLonLat(dragHistory.front(), glm::vec2(lon, lat)) / glm::vec2(dragHistory.size());
 }
 
-
 bool PlanetCamera::cursorToLonLat(const glm::vec3 & rayDir, vec2 &lonLat, float offset) const
 {
+    float radius = planet->config.radius;
+    
     glm::vec3 intersection, normal;
-    if (glm::intersectRaySphere(camera->position, rayDir, glm::vec3(0.f), radius - offset, intersection, normal)) {
+    if (glm::intersectRaySphere(camera->getPosition(), rayDir, planet->get_position(), radius - offset, intersection, normal)) {
         lonLat.x = glm::degrees(std::atan2(intersection.z, intersection.x) + 180.0f);
         lonLat.y = glm::degrees(glm::acos((intersection.y) / radius));
         return true;

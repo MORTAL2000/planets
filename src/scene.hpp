@@ -24,10 +24,14 @@ class Scene {
         bool camDebugMode = true;
         void updateCamera(float dt);
 
+        bool cursorToLonLat(const glm::vec3 & rayDir, vec2 &lonLat, float offset) const;
+
+
         std::vector<Renderable *> _objects;
     public:
         Scene();
 
+        Planet * selected;
         FlyingCamera flyingCamera;
         PlanetCamera planetCamera;
 

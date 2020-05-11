@@ -36,7 +36,7 @@ void WaterRenderer::applyUniforms(Shader & shader) {
     // glUniformMatrix4fv(shader.uniform("viewProjection"), 1, GL_FALSE, &camera.combined[0][0]);
     glUniform1f(shader.uniform("time"), universe.getTime());
     glUniform2f(shader.uniform("scrSize"), WindowSize::widthPixels, WindowSize::heightPixels);
-    glUniform3f(shader.uniform("camPos"), camera.position.x, camera.position.y, camera.position.z);
+    glUniform3fv(shader.uniform("camPos"), 1, glm::value_ptr(camera.getPosition())); //camera.position.x, camera.position.y, camera.position.z);
     glUniform3f(shader.uniform("sunDir"), camera.sunDir.x, camera.sunDir.y, camera.sunDir.z);
 
     // Bind Textures

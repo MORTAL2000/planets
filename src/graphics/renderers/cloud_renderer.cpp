@@ -77,9 +77,9 @@ void CloudRenderer::render(double dt)
         t = rotate(t, cloud.lat * mu::DEGREES_TO_RAD, mu::X);
         t = translate(t, vec3(0, planet->config.radius + 35, 0));
 
-        vec3 up = camera.up, right = camera.right;
-        up = inverse(t) * vec4(up, 0);
-        right = inverse(t) * vec4(right, 0);
+        CameraState state = camera.getState();
+        glm::vec3 up = inverse(t) * vec4(state.up, 0);
+        glm::vec3 right = inverse(t) * vec4(state.right, 0);
         t = camera.combined * t;
 
         float light = 0;

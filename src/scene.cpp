@@ -2,6 +2,7 @@
 
 // Standard Headers
 #include <limits>
+#include <glm/gtx/intersect.hpp>
 
 // Local Headers
 #include "graphics/window_size.hpp"
@@ -15,13 +16,11 @@ Scene::Scene():
     reflectionBuffer.addColorTexture(GL_RGB, GL_LINEAR, GL_LINEAR);
     reflectionBuffer.addDepthBuffer();
 
-    camera.position = glm::vec3(0, 0, 300);
-    camera.lookAt(glm::vec3(0.f), camera.up);
+    selected = universe.getPlanets()[0];
+    camera.lookAt(glm::vec3(0.f));
 
     flyingCamera.speedMultiplier = 100;
-//    planetCamera.speedMultiplier = 100;
-
-    // phong_renderer = new PhongRenderer();
+    planetCamera.speedMultiplier = 100;
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -42,6 +41,38 @@ Scene::Scene():
     // Setup renderers
     renderers.push_back(new TerrainRenderer());
     renderers.push_back(new WaterRenderer());
+}
+
+void Scene::update(float dt) {
+    draw(dt);
+
+    if (MouseInput::justPressed(GLFW_MOUSE_BUTTON_LEFT)) {
+
+        std::cout << "Clicked!" << std::endl;
+
+        glm::vec3 rayDir = camera.getCursorRayDirection();
+
+        float nearestDist = std::numeric_limits<float>::max();
+        Planet * nearest = nullptr;
+        
+        for (Planet * planet : universe.getPlanets()) {
+            float dist;
+            if (glm::intersectRaySphere(camera.getPosition(), rayDir, planet->get_position(), planet->config.radius * planet->config.radius, dist)) {
+                if (dist < nearestDist) {
+                    nearestDist = dist;
+                    nearest = planet;
+                }
+            } 
+        }
+
+        if (nearest != nullptr) {
+            selected = nearest;
+            std::cout << "Selected: " << selected->name << std::endl;
+        }
+    }
+
+
+    universe.update(dt);
 }
 
 void Scene::draw(float dt) {
@@ -75,7 +106,7 @@ void Scene::draw(float dt) {
     // cloud_renderer.render(time, newDeltaTime, cam, sunDir, &lvl->earth);
     // glDisable(GL_BLEND);
 
-    universe.update(dt);
+    
     check_gl_error();
 
     // sceneBuffer->unbind();
@@ -93,26 +124,33 @@ void Scene::draw(float dt) {
 }
 
 void Scene::updateCamera(float dt) {
-    if (KeyInput::justPressed(GLFW_KEY_G))
+    if (KeyInput::justPressed(GLFW_KEY_P))
         MouseInput::setLockedMode(false);
-    else if (KeyInput::justReleased(GLFW_KEY_G) && !camPlanetMode)
+    else if (KeyInput::justReleased(GLFW_KEY_P) && !camPlanetMode)
         MouseInput::setLockedMode(true);
-
+        
     if (KeyInput::justPressed(GLFW_KEY_C))
     {
         camPlanetMode = !camPlanetMode;
         MouseInput::setLockedMode(!camPlanetMode);
     }
 
-    if (camPlanetMode) 
-        planetCamera.update(dt); // planet camera movement
-    else if (!KeyInput::pressed(GLFW_KEY_G))
-        flyingCamera.update(dt); // flying camera movement
+    if (camPlanetMode) {
+        // Check if I should animate to the new planet
+        if (planetCamera.planet != selected) {
+            // camera.lookAt(selected->get_position());
+            planetCamera.planet = selected;
+
+            camera.moveTo(planetCamera.calculate(dt), true);
+        } else {
+            camera.moveTo(planetCamera.calculate(dt), false);
+        }
+    }
+    else if (!KeyInput::pressed(GLFW_KEY_P))
+        camera.moveTo(flyingCamera.calculate(dt), false); // flying camera movement
 
     float z_far = 0,
     //     z_near = std::numeric_limits<float>::max();
-
-        // float z_far = 2000;
          z_near = 0.1;
     
     // Base it off of bounding boxes
@@ -121,7 +159,7 @@ void Scene::updateCamera(float dt) {
     // }
 
     for (Planet * planet : universe.getPlanets()) {
-        float dist = glm::distance(planet->get_position(), camera.position);
+        float dist = glm::distance(planet->get_position(), camera.getPosition());
 
         z_far = max(z_far, dist + planet->config.radius + 10.f);
         // z_near = min(z_near, dist - planet->config.radius);
@@ -129,7 +167,7 @@ void Scene::updateCamera(float dt) {
 
     assert(z_far > z_near);
 
-    camera.calculate(z_near, z_far);
+    camera.calculate(z_near, z_far, dt);
 
     if (camDebugMode) camera.ShowDebugWindow(&camDebugMode);
 }

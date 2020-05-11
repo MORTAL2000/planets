@@ -15,45 +15,48 @@ FlyingCamera::FlyingCamera(Camera *cam)
     MouseInput::setLockedMode(true);
 }
 
-void FlyingCamera::update(float dt)
+CameraState FlyingCamera::calculate(float dt)
 {
     speedMultiplier += MouseInput::yScroll * .5;
     if (speedMultiplier < 0) speedMultiplier = 0;
 
+    CameraState state = camera->getState();
+
     if (KeyInput::pressed(GLFW_KEY_O))
-        camera->orientUp(glm::normalize(camera->position));
+        camera->orientUp(glm::normalize(state.position));
     
     if (KeyInput::pressed(GLFW_KEY_W))
-        camera->position += camera->direction * glm::vec3(dt * speedMultiplier);
+        state.position += state.direction * glm::vec3(dt * speedMultiplier);
 
     if (KeyInput::pressed(GLFW_KEY_S))
-        camera->position += camera->direction * glm::vec3(-dt * speedMultiplier);
+        state.position += state.direction * glm::vec3(-dt * speedMultiplier);
 
     if (KeyInput::pressed(GLFW_KEY_D))
-        camera->position += camera->right * glm::vec3(dt * speedMultiplier);
+        state.position += state.right * glm::vec3(dt * speedMultiplier);
 
     if (KeyInput::pressed(GLFW_KEY_A))
-        camera->position += camera->right * glm::vec3(-dt * speedMultiplier);
+        state.position += state.right * glm::vec3(-dt * speedMultiplier);
 
     if (KeyInput::pressed(GLFW_KEY_Q))
-        camera->rotate(-dt * speedMultiplier, camera->direction);
+        camera->rotate(-dt * speedMultiplier, state.direction);
 
     if (KeyInput::pressed(GLFW_KEY_E))
-        camera->rotate(dt * speedMultiplier, camera->direction);
+        camera->rotate(dt * speedMultiplier, state.direction);
 
     if (KeyInput::pressed(GLFW_KEY_LEFT_SHIFT))
-        camera->position -= camera->up * glm::vec3(dt * speedMultiplier);
+        state.position -= state.up * glm::vec3(dt * speedMultiplier);
 
     if (KeyInput::pressed(GLFW_KEY_SPACE))
-        camera->position += camera->up * glm::vec3(dt * speedMultiplier);
+        state.position += state.up * glm::vec3(dt * speedMultiplier);
 
     if (MouseInput::deltaMouseX != 0)
-        camera->rotate(MouseInput::deltaMouseX / WindowSize::width * -100 * mouseSensivity, camera->up);
+        camera->rotate(MouseInput::deltaMouseX / WindowSize::width * -100 * mouseSensivity, state.up);
 
     if (MouseInput::deltaMouseY != 0)
-        camera->rotate(MouseInput::deltaMouseY / WindowSize::height * -100 * mouseSensivity, camera->right);
+        camera->rotate(MouseInput::deltaMouseY / WindowSize::height * -100 * mouseSensivity, state.right);
     
     // std::cout << glm::to_string(camera->position) << std::endl;
     // camera->update();
+    return state;
 }
 

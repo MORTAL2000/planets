@@ -19,7 +19,7 @@ const float EARTH_RADIUS = 150; //ATMOSPHERE_RADIUS = 198;
 static PlanetConfig getEarth2Config() {
     PlanetConfig config;
     config.name = "Earth2";
-    config.radius = EARTH_RADIUS;
+    config.radius = EARTH_RADIUS / 2.f;
     // config.color = glm::vec3(0.f, 0.f, 1.f);
     // config.center = glm::vec3(300, 0, 300);
 
@@ -43,7 +43,7 @@ Universe::Universe() {
     renderables.push_back(earth);
 
     Planet * earth2 = new Planet(getEarth2Config());
-    earth2->set_position(glm::vec3(300.f, 0.f, 300.f));
+    earth2->set_position(glm::vec3(0.f, 0.f, 300.f));
     generator.generate(earth2);
     planets.push_back(earth2);
     renderables.push_back(earth2);

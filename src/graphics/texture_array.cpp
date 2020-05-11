@@ -67,7 +67,6 @@ void TextureArray::generate(unsigned int width, unsigned int height, unsigned in
         glCompressedTexImage3D(GL_TEXTURE_2D_ARRAY, mipMapLevel, Internal_Format, w, h, layers, 0, size * layers, 0);
         
         for (unsigned int i = 0; i < this->layers; i++) {
-            std::cout << "Buffer generated: " << buffers[i] << std::endl;
             glCompressedTexSubImage3D(GL_TEXTURE_2D_ARRAY, mipMapLevel, 0, 0, i, w, h, 1, Internal_Format, size, buffers[i] + offset);
         }
 

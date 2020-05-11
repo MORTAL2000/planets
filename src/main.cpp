@@ -58,15 +58,12 @@ static void ShowOverlap(const char * text)
             ImGui::Text("Mouse Position: (%.1f,%.1f)", io.MousePos.x, io.MousePos.y);
         else
             ImGui::Text("Mouse Position: <invalid>");
-        if (ImGui::BeginPopupContextWindow())
-        {
-            if (ImGui::MenuItem("Custom",       NULL, corner == -1)) corner = -1;
-            if (ImGui::MenuItem("Top-left",     NULL, corner == 0)) corner = 0;
-            if (ImGui::MenuItem("Top-right",    NULL, corner == 1)) corner = 1;
-            if (ImGui::MenuItem("Bottom-left",  NULL, corner == 2)) corner = 2;
-            if (ImGui::MenuItem("Bottom-right", NULL, corner == 3)) corner = 3;
-            ImGui::EndPopup();
-        }
+        ImGui::Separator();
+
+        if (Globals::scene->selected)
+            ImGui::Text("Selected Planet: %s", Globals::scene->selected->name.c_str());
+        else
+            ImGui::Text("Selected Planet: <none>");
     }
     ImGui::End();
 }
@@ -167,7 +164,7 @@ int main(int argc, char * argv[]) {
             remaining_second = 1;
         }
 
-         ShowOverlap(fps.c_str());
+        ShowOverlap(fps.c_str());
 
         if (WindowSize::should_resize)
         {
@@ -175,7 +172,7 @@ int main(int argc, char * argv[]) {
             Globals::scene->resize();
         }
 
-        Globals::scene->draw(min(delta_time, .1));
+        Globals::scene->update(min(delta_time, .1));
         check_gl_error();
 
         // ImGui::ShowDemoWindow();

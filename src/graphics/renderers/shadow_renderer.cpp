@@ -12,9 +12,11 @@ ShadowRenderer::ShadowRenderer()
 
 void ShadowRenderer::begin(const Camera &mainCam, const vec3 &sunDir)
 {
-    vec3 frustumCenter = mainCam.position + mainCam.direction * float(length(mainCam.position) - 130);
+    CameraState state = mainCam.getState();
+    vec3 frustumCenter = state.position + state.direction * float(length(state.position) - 130);
 
-    sunCam.position = frustumCenter - sunDir * float(120);
+    state.position = frustumCenter - sunDir * float(120);
+    sunCam.moveTo(state, false);
     sunCam.lookAt(frustumCenter);
 
     sunCam.calculate(0, 300);
