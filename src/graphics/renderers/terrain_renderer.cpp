@@ -35,7 +35,7 @@ TerrainRenderer::TerrainRenderer() {
     check_gl_error();
 }
 
-void TerrainRenderer::render() {
+void TerrainRenderer::render(double dt) {
     Shader shader = ResourceManager::GetShader("terrain");
     shader.enable();
     check_gl_error();

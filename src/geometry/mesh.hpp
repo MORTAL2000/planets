@@ -41,6 +41,7 @@ class Mesh : public VertData {
 
         std::string name;
         std::vector<unsigned short> indices;
+        GLenum mode = GL_TRIANGLES;
 
         unsigned int nrOfVertices, nrOfIndices;
         int baseVertex = 0, indicesBufferOffset = 0;

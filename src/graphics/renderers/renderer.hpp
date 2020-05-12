@@ -10,8 +10,8 @@
 
 class Renderer {
     protected:
-        virtual void draw_objects(std::vector<Renderable *> renderables, glm::mat4 parent_model, Shader & shader, RenderType type, bool update_model); 
+        virtual void draw_objects(const std::vector<Renderable *> & renderables, glm::mat4 parent_model, Shader & shader, RenderType type, bool update_model); 
     public:
         Renderer();
-        virtual void render() = 0;
+        virtual void render(double dt) = 0;
 };

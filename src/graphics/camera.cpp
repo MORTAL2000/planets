@@ -17,7 +17,7 @@
 
 
 Camera::Camera(float viewportWidth, float viewportHeight, float fov):
-    state({glm::vec3(0, 0, 500), glm::vec3(0, 0, -1), glm::vec3(0, 1, 0), glm::vec3(1, 0, 0)}),
+    state({glm::vec3(100, 100, -500), glm::vec3(0, 0, 1), glm::vec3(0, 1, 0), glm::vec3(1, 0, 0)}),
     viewportWidth(viewportWidth), viewportHeight(viewportHeight),
     fov(fov)
 {

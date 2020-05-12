@@ -17,7 +17,7 @@
 //     float progress = 0.;
 // };
 
-class Spacecraft: public Renderable, public OrbitalMass {
+class Spacecraft: public Renderable {
 //    glm::vec3 relative_velocity;
 
     // std::optional<Mission> mission;

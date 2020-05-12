@@ -15,5 +15,5 @@ class UnderwaterRenderer: public Renderer {
     public: 
         UnderwaterRenderer();
         FrameBuffer underwaterBuffer;
-        void render();
+        void render(double dt);
 };

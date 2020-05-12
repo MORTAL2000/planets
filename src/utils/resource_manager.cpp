@@ -158,7 +158,7 @@ SharedTexArray ResourceManager::loadTextureArrayFromDDSFiles(const std::vector<s
 
     GLuint width = d.width, height = d.height, layerCount = datas.size(), mipMapCount = d.mipMapCount;
 
-    texarray->Max_Level = mipMapCount;
+    texarray->Max_Level = mipMapCount - 1;
     texarray->Internal_Format = d.format;
 
     unsigned char ** buffers = new unsigned char *[layerCount];
@@ -192,13 +192,12 @@ SharedCubeMap ResourceManager::loadCubeMapFromDDSFiles(const std::vector<std::st
 
     cube_map->Internal_Format = d.format;
 
-    std::vector<unsigned char *> buffers;
-    for (auto &data : datas)
-    {
-        if (data.width != width || data.height != height || data.format != d.format)
-            throw "CubeMap: DDS files cannot have different dimensions/formats/mipmap-levels";
+    unsigned char * buffers[6];
+    for (unsigned int i = 0; i < 6; i++) {
+        if (datas[i].width != width || datas[i].height != height || datas[i].format != d.format)
+            throw "CubeMap: DDS files cannot have different dimensions/formats";
 
-        buffers.push_back(data.buffer);
+        buffers[i] = datas[i].buffer;
     }
 
     cube_map->generate(width, height, buffers);

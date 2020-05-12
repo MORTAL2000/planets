@@ -92,10 +92,15 @@ SharedMesh Sphere::generate(const std::string &meshName, unsigned int sectorCoun
             nz = z * lengthInv;
             mesh->set(glm::vec3(nx, ny, nz), vertI, norOffset);
 
-            // vertex tex coord between [0, 1]
-            s = (float)j / sectorCount;
-            t = (float)i / stackCount;
-            mesh->set(glm::vec2(s, t), vertI, texOffset);
+            // The atmosphere meshes don't have textures
+            if (texOffset != -1) {
+                // vertex tex coord between [0, 1]
+                s = (float)j / sectorCount;
+                t = (float)i / stackCount;
+                mesh->set(glm::vec2(s, t), vertI, texOffset);
+            }
+
+          
             vertI++;
         }
     }
@@ -135,7 +140,9 @@ SharedMesh Sphere::generate(const std::string &meshName, unsigned int sectorCoun
     }
     assert(mesh->nrOfIndices == i);
 
-    TangentCalculator::addTangentsToMesh(mesh);
+    if (attrs.contains(VertAttributes::TANGENT)) {
+        TangentCalculator::addTangentsToMesh(mesh);
+    }
 
     return mesh;
 }

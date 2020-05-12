@@ -46,7 +46,7 @@ void Mesh::render() {
 
     // draw mesh
     glDrawElementsBaseVertex(
-        GL_TRIANGLES,
+        mode,
         nrOfIndices,
         GL_UNSIGNED_SHORT,
         (void *)(uintptr_t)indicesBufferOffset,
@@ -64,7 +64,7 @@ void Mesh::renderInstances(GLsizei count)
     // glPolygonMode(GL_FRONT_AND_BACK, (true) ? GL_LINE : GL_FILL);
    
     glDrawElementsInstancedBaseVertex(
-        GL_TRIANGLES,
+        mode,
         nrOfIndices,
         GL_UNSIGNED_SHORT,
         (void *)(uintptr_t)indicesBufferOffset,

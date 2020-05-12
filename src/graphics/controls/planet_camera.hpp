@@ -16,6 +16,8 @@ class PlanetCamera
     CameraState calculate(float dt);
     Planet * planet = nullptr;
 
+    float atmosphereTilt = 0;
+
     float speedMultiplier = 1;
     float zoomVelocity = 0;
     float lon = 160, lat = 75, zoom = 0, actualZoom = 0;

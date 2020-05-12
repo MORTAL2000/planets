@@ -1,15 +1,18 @@
 #pragma once
 
 #include "orbital_mass.hpp"
+#include "sun.hpp"
 #include "planet.hpp"
 #include "utils/generation/planet_generator.hpp"
 
 class Universe {
     private:
         double time;
+        float simulationSpeed = 1.f;
 
         PlanetGenerator generator;
 
+        std::vector<Sun *> suns;
         std::vector<Planet *> planets;
         std::vector<Renderable *> renderables;
         OrbitalMass * center;
@@ -20,12 +23,12 @@ class Universe {
     public:
         Universe();
         
-        double getTime() { return time; }
+        const double & getTime() const { return time; }
+        const float & getSpeed() const { return simulationSpeed; }
 
         void update(float dt);
 
-        glm::vec3 calculateSunDirection(float lat, float lon, float zoom);
-
-        std::vector<Planet*> getPlanets();
-        std::vector<Renderable*> getRenderables();
+        const std::vector<Planet*> & getPlanets() const;
+        const std::vector<Renderable*> & getRenderables() const;
+        const std::vector<Sun*> & getSuns() const;
 };

@@ -4,7 +4,7 @@
 #include "common/planet.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/texture.hpp"
-
+#include "graphics/renderers/renderer.hpp"
 #include "utils/resource_manager.hpp"
 
 struct Cloud
@@ -13,18 +13,16 @@ struct Cloud
     int spawnPoints;
 };
 
-class CloudRenderer
+class CloudRenderer: public Renderer
 {
   public:
-    CloudRenderer(Planet * planet);
+    CloudRenderer();
 
     void render(double dt);
 
   private:
     SharedMesh quad;
-    Planet * planet;
     SharedTexture noiseTex;
     std::vector<Cloud> clouds;
-
 };
 

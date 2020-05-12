@@ -4,7 +4,7 @@
 
 Renderer::Renderer() {}
 
-void Renderer::draw_objects(std::vector<Renderable *> renderables, glm::mat4 parent_model, Shader & shader, RenderType type, bool update_model) {
+void Renderer::draw_objects(const std::vector<Renderable *> & renderables, glm::mat4 parent_model, Shader & shader, RenderType type, bool update_model) {
     if (renderables.size() == 0) return;
 
     const Camera camera = Globals::scene->getCamera();

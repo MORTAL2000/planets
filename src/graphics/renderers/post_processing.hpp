@@ -1,13 +1,24 @@
 #pragma once
 
 // Local Headers
-// #include "common/planet.hpp"
 #include "graphics/shader.hpp"
+#include "graphics/texture_array.hpp"
 
-// #include "graphics/texture.hpp"
+struct LensFlare
+{
+    int texture;
+    glm::vec4 color;
+    float scale, dist;
+    bool rotate;
+};
 
 class PostProcessing {
     private:
+        static const LensFlare flares[];
+        SharedTexArray flareTextures;
+        float lensFlareAlpha = 0;
+
+        void renderFlares(Shader & shader);
         void applyUniforms(Shader & shader);
     public: 
         PostProcessing();

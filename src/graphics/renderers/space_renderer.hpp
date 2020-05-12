@@ -8,35 +8,33 @@
 #include "geometry/model.hpp"
 #include "graphics/texture.hpp"
 #include "graphics/texture_array.hpp"
+#include "graphics/renderers/renderer.hpp"
 
-struct LensFlare
-{
-    int texture;
-    glm::vec4 color;
-    float scale, dist;
-    bool rotate;
-};
+// struct LensFlare
+// {
+//     int texture;
+//     glm::vec4 color;
+//     float scale, dist;
+//     bool rotate;
+// };
 
-class SpaceRenderer
+class SpaceRenderer: public Renderer
 {
   public:
     SpaceRenderer();
-
-    void renderBox();
-
-    void renderSun();
+    void render(double dt);
 
   private:
 
-    static const LensFlare flares[];
+    // static const LensFlare flares[];
 
-    SharedTexture sunTexture;
+    // SharedTexture sunTexture;
 
-    SharedTexArray flareTextures;
+    // SharedTexArray flareTextures;
 
-    SharedMesh cube;
+    unsigned int skyboxVAO, skyboxVBO;
     SharedCubeMap cubeMap;
 
-    float lensFlareAlpha = 0;
+//    float lensFlareAlpha = 0;
 };
 

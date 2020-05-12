@@ -49,6 +49,7 @@ set(PROJECT_SOURCES
     src/main.cpp
     src/scene.cpp
     src/common/planet.cpp
+    src/common/sun.cpp
     src/common/universe.cpp
     src/common/orbital_mass.cpp
     src/entities/entity.cpp
@@ -72,13 +73,15 @@ set(PROJECT_SOURCES
     src/graphics/input/key_input.cpp
 	src/graphics/input/mouse_input.cpp
 	src/graphics/renderers/renderer.cpp
-	src/graphics/renderers/lines.cpp
+	src/graphics/renderers/path_renderer.cpp
 	src/graphics/renderers/phong.cpp
 	src/graphics/renderers/water_renderer.cpp
 	src/graphics/renderers/terrain_renderer.cpp
+	src/graphics/renderers/sun_renderer.cpp
 	src/graphics/renderers/space_renderer.cpp
 	src/graphics/renderers/underwater_renderer.cpp
 	src/graphics/renderers/shadow_renderer.cpp
+	src/graphics/renderers/atmosphere_renderer.cpp
 	src/graphics/renderers/cloud_renderer.cpp
 	src/graphics/renderers/post_processing.cpp
     src/graphics/renderable.cpp

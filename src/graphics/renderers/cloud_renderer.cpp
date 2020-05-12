@@ -9,9 +9,8 @@
 
 const int nrOfSpawnpoints = 30, particlesPerOffset = 6;
 
-CloudRenderer::CloudRenderer(Planet *planet):   
-    quad(new Mesh("cloud_quad", 4, 6, Mesh::getQuad()->attributes)),
-    planet(planet)
+CloudRenderer::CloudRenderer():   
+    quad(new Mesh("cloud_quad", 4, 6, Mesh::getQuad()->attributes))
 {
     ResourceManager::LoadShader("clouds.vert", "clouds.frag", "clouds");
     noiseTex = ResourceManager::LoadTexture("textures/noise.dds", "noise");
@@ -39,6 +38,7 @@ void CloudRenderer::render(double dt)
     Camera camera = Globals::scene->getCamera();
     Universe universe = Globals::scene->getUniverse();
 
+    float planetRadius = 150;
 
     if (clouds.size() == 0) dt = 30;
     while (clouds.size() < 40)
@@ -75,7 +75,7 @@ void CloudRenderer::render(double dt)
 
         mat4 t = rotate(mat4(1.), cloud.lon * mu::DEGREES_TO_RAD, mu::Y);
         t = rotate(t, cloud.lat * mu::DEGREES_TO_RAD, mu::X);
-        t = translate(t, vec3(0, planet->config.radius + 35, 0));
+        t = translate(t, vec3(0, planetRadius + 35, 0));
 
         CameraState state = camera.getState();
         glm::vec3 up = inverse(t) * vec4(state.up, 0);

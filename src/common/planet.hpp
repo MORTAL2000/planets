@@ -15,6 +15,7 @@ struct PlanetConfig {
     std::string name;
 
     float radius;
+    float mass = 1;
     // glm::vec3 center = glm::vec3(0.f);
     
     // Mesh
@@ -22,6 +23,11 @@ struct PlanetConfig {
 
     // Noise
     float roughness = 1;
+
+    OrbitalParameters orbit = {
+        0.f, 0, 0, 0, 0
+    };
+    
 };
 
 class Planet: public OrbitalMass, public Renderable {
@@ -34,6 +40,8 @@ class Planet: public OrbitalMass, public Renderable {
         
         SharedMesh terrainMesh;
         SharedMesh waterMesh;
+        SharedMesh atmosphereMesh;
+        SharedMesh orbitMesh;
 
         /**
          * Texture map of the planet.
@@ -53,6 +61,9 @@ class Planet: public OrbitalMass, public Renderable {
         void generateOrbitalTimes();
 
         void upload();
+        void uploadOrbit();
+
+        void update(float time);
         void render(RenderType type);
 
         glm::vec3 calculatePointOnPlanet(glm::vec3 pointOnUnitSphere);

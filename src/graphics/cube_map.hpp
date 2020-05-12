@@ -18,13 +18,14 @@ class CubeMap
     GLuint id;
     unsigned int width, height;
 
+    unsigned int Texture_Type; // format of texture object
     unsigned int Internal_Format; // format of texture object
-    unsigned int Mip_Map_Count; // number of mip maps, not currently supported
+    unsigned int Image_Format; // format of texture object
 
     CubeMap();
     ~CubeMap();
 
-    void generate(unsigned int width, unsigned int height, std::vector<unsigned char*> buffers);
+    void generate(unsigned int width, unsigned int height, unsigned char ** buffers);
     void bind(GLuint unit);
 
 };

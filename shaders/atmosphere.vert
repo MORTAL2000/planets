@@ -5,7 +5,10 @@ layout(location = 0) in vec3 a_pos;
 layout(location = 1) in vec3 a_normal;
 
 uniform mat4 MVP;
+uniform mat4 atmoModel;
+
 uniform vec3 sunDir;
+uniform vec3 camPos;
 uniform float camDist;
 
 out vec3 v_color;
@@ -18,7 +21,7 @@ float clamp1(float x)
 
 void main()
 {
-    gl_Position = MVP * vec4(a_pos, 1);
+    gl_Position = MVP * atmoModel * vec4(a_pos, 1);
 
     float camDot = 1. - dot(a_normal, vec3(0, 1, 0));
     float edge = camDot * 12. - (camDist / 150.);

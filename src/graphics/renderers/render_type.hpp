@@ -1,3 +1,3 @@
 #pragma once
 
-enum RenderType { Terrain, Water };
+enum RenderType { Atmosphere, Terrain, Water, Path };

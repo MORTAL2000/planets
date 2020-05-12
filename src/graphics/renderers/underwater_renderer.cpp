@@ -19,7 +19,7 @@ UnderwaterRenderer::UnderwaterRenderer(): underwaterBuffer(1024, 1024) {
     sand = ResourceManager::LoadTexture("textures/tc_sand.dds", "sand");
 }
 
-void UnderwaterRenderer::render() {
+void UnderwaterRenderer::render(double dt) {
     Universe universe = Globals::scene->getUniverse();
 
     underwaterBuffer.bind();

@@ -67,7 +67,7 @@ CameraState PlanetCamera::calculate(float dt)
     zoomVelocity = abs(prevActualZoom - actualZoom) / dt;
 
     float altitude = 5. + maxAltitude * (1. - actualZoom);
-    float atmosphereTilt = 1.f - clamp(altitude / maxAtmosphere, 0.f, 1.f);
+    atmosphereTilt = 1.f - clamp(altitude / maxAtmosphere, 0.f, 1.f);
 
     // Target camera details
     glm::vec3 translateCam = glm::vec3(0, planet->config.radius, 0);

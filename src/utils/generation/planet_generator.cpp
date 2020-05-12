@@ -210,19 +210,26 @@ void PlanetGenerator::generate(Planet *plt)
         .add_(VertAttributes::TEX_COORDS)
         .add_(VertAttributes::TANGENT);
 
+
+    VertAttributes atmosphereAttrs;
+    atmosphereAttrs.add_(VertAttributes::POSITION).add_(VertAttributes::NORMAL);
+
     PlanetConfig config = plt->config;
 
     // Make a unit sphere
     Cubesphere cubesphere(1, config.subdivision, false);
 
-    Sphere sphere(config.radius);
-
     unsigned int nIndices = cubesphere.getIndexCount();
     unsigned int nVertices = cubesphere.getVertexCount();
   
     plt->terrainMesh = std::make_shared<Mesh>(plt->config.name + "_terrain", nVertices, nIndices, terrainAttrs);
-    plt->waterMesh = sphere.generate(plt->config.name + "_water", 100, 70, waterAttrs); //sphere.gstd::make_shared<Mesh>(plt->config.name + "_water", nVertices, nIndices, attrs);
     
+    Sphere water(config.radius);
+    plt->waterMesh = water.generate(plt->config.name + "_water", 100, 70, waterAttrs); //sphere.gstd::make_shared<Mesh>(plt->config.name + "_water", nVertices, nIndices, attrs);
+
+    Sphere atmosphere(config.radius + 50);
+    plt->atmosphereMesh = atmosphere.generate(plt->config.name + "_atmosphere", 50, 130, atmosphereAttrs);
+
     const float * vertices = cubesphere.getVertices();
 //    const float * normals = cubesphere.getNormals();
     const float * texCords = cubesphere.getTexCoords();

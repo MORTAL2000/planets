@@ -16,9 +16,11 @@ WaterRenderer::WaterRenderer() {
     seaWaves = ResourceManager::LoadTexture("textures/sea_waves.dds", "seaWaves");
 }
 
-void WaterRenderer::render() {
+void WaterRenderer::render(double dt) {
     Shader shader = ResourceManager::GetShader("water");
     shader.enable();
+
+    glEnable(GL_BLEND);
 
     applyUniforms(shader);
 

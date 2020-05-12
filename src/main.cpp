@@ -50,7 +50,7 @@ static void ShowOverlap(const char * text)
     }
     ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
     
-    if (ImGui::Begin("Example: Simple overlay", NULL, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
+    if (ImGui::Begin("Info", NULL, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
     {
         ImGui::TextUnformatted(text);
         ImGui::Separator();
@@ -64,6 +64,10 @@ static void ShowOverlap(const char * text)
             ImGui::Text("Selected Planet: %s", Globals::scene->selected->name.c_str());
         else
             ImGui::Text("Selected Planet: <none>");
+
+        const Universe & universe = Globals::scene->getUniverse();
+        ImGui::Text("Time: %f", universe.getTime());
+        ImGui::Text("Speed: %fx", universe.getSpeed());
     }
     ImGui::End();
 }

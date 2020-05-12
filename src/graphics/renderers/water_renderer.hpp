@@ -13,5 +13,5 @@ class WaterRenderer: public Renderer {
         void applyUniforms(Shader & shader);
     public: 
         WaterRenderer();
-        void render();
+        void render(double dt);
 };

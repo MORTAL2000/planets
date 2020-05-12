@@ -8,12 +8,10 @@
 #include "graphics/texture.hpp"
 #include "graphics/texture_array.hpp"
 
-class TerrainRenderer: public Renderer {
+class PathRenderer: public Renderer {
     private:
-        SharedTexture grass; //, ground, rock, sand, snow;
-        SharedTexArray terrainTextures;
         void applyUniforms(Shader & shader);
     public: 
-        TerrainRenderer();
+        PathRenderer();
         void render(double dt);
 };
