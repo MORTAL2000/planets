@@ -40,15 +40,13 @@ void UnderwaterRenderer::render(double dt) {
 
 void UnderwaterRenderer::applyUniforms(Shader & shader) {
     
-    const Camera & camera = Globals::scene->getCamera();
     Universe universe = Globals::scene->getUniverse();
 
     // glUniformMatrix4fv(shader.uniform("viewProjection"), 1, GL_FALSE, &camera.combined[0][0]);
     glUniform1f(shader.uniform("time"), universe.getTime());
     // glUniform2f(shader.uniform("scrSize"), WindowSize::widthPixels, WindowSize::heightPixels);
     // glUniform3f(shader.uniform("camPos"), camera.position.x, camera.position.y, camera.position.z);
-    glUniform3f(shader.uniform("sunDir"), camera.sunDir.x, camera.sunDir.y, camera.sunDir.z);
-
+    glUniform3f(shader.uniform("sunDir"), camera->sunDir.x, camera->sunDir.y, camera->sunDir.z);
 
     // Bind Textures
     caustics->bind(0);

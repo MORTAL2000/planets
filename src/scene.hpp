@@ -5,6 +5,7 @@
 #include "graphics/controls/flying_camera.hpp"
 #include "graphics/controls/planet_camera.hpp"
 
+#include "graphics/input/key_input.hpp"
 #include "graphics/renderable.hpp"
 #include "graphics/frame_buffer.hpp"
 #include "graphics/renderers/shadow_renderer.hpp"
@@ -35,22 +36,20 @@ class Scene {
 
         std::vector<Renderer *> renderers;
         
-        ShadowRenderer shadow_renderer;
-        UnderwaterRenderer underwater_renderer;
-        // TerrainRenderer terrain_renderer;
-        // WaterRenderer water_renderer;
-        // SpaceRenderer space_renderer;
-        PostProcessing post_processing;
+        ShadowRenderer * shadow_renderer;
+        UnderwaterRenderer * underwater_renderer;
+        PostProcessing * post_processing;
         FrameBuffer reflectionBuffer, *sceneBuffer = NULL;
 
-        const Camera & getCamera() { return camera; }
         const Universe & getUniverse() { return universe; }
 
         void resize();
+        void init();
         void draw(float dt);
         void update(float dt);
 
         // void add_renderable(Renderable * renderable, Renderable * parent = nullptr);
+        friend class Renderer;
 };
 
 namespace Globals {

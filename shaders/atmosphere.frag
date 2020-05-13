@@ -5,6 +5,7 @@ out vec4 color;
 
 in vec3 v_color;
 in float v_alpha;
+in vec3 v_normal;
 
 void main()
 {

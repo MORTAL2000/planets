@@ -15,6 +15,7 @@ struct PlanetConfig {
     std::string name;
 
     float radius;
+    float cloudHeight = 20;
     float mass = 1;
     // glm::vec3 center = glm::vec3(0.f);
     
@@ -74,7 +75,7 @@ class Planet: public OrbitalMass, public Renderable {
         static glm::vec2 deltaLonLat(glm::vec2 a, glm::vec2 b);
         glm::vec3 lonLatTo3d(float lon, float lat, float altitude) const;
 
-        bool rayToLonLat(const glm::vec3 &rayOrigin, const glm::vec3 &rayDirection, glm::vec2 &lonLat) const;
+        bool rayToLonLat(const glm::vec3 &rayOrigin, const glm::vec3 &rayDirection, glm::vec2 &lonLat);
         
         void toBinary(std::vector<uint8> &out) const;
 

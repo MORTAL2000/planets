@@ -15,6 +15,8 @@ struct CameraState {
     glm::vec3 position, direction, up, right;
 };
 
+enum ProjectionType { Orthographic, Perspective };
+
 class Camera {
     private:
 
@@ -27,8 +29,10 @@ class Camera {
         // void updateAnimation(float dt);
         CameraState state;
     public:
-        Camera(float viewportWidth, float viewportHeight, float fov);
+        Camera(float viewportWidth, float viewportHeight, float fov = 45);
         void ShowDebugWindow(bool* p_open);
+
+        ProjectionType mode = ProjectionType::Perspective;
         
         glm::mat4 projection, view, combined;
         float viewportWidth, viewportHeight, fov;
@@ -49,7 +53,7 @@ class Camera {
         void lookAt(glm::vec3 target);
         void lookAt(glm::vec3 target, glm::vec3 localYAxis);
         
-        void rotate(float degrees, glm::vec3 axis);
+        void rotate(float degrees, glm::vec3 axis, CameraState & state);
         void moveTo(CameraState newState, bool calculateAnimation = false);
         void rotateTo(glm::vec3 direction, glm::vec3 right, glm::vec3 up);
 

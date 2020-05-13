@@ -74,7 +74,6 @@ set(PROJECT_SOURCES
 	src/graphics/input/mouse_input.cpp
 	src/graphics/renderers/renderer.cpp
 	src/graphics/renderers/path_renderer.cpp
-	src/graphics/renderers/phong.cpp
 	src/graphics/renderers/water_renderer.cpp
 	src/graphics/renderers/terrain_renderer.cpp
 	src/graphics/renderers/sun_renderer.cpp

@@ -33,7 +33,5 @@ void PathRenderer::render(double dt) {
 }
 
 void PathRenderer::applyUniforms(Shader & shader) {
-    const Camera camera = Globals::scene->getCamera();
-
-    glUniformMatrix4fv( shader.uniform("MVP"), 1, GL_FALSE, glm::value_ptr(camera.combined)); // projection matrix
+    glUniformMatrix4fv( shader.uniform("MVP"), 1, GL_FALSE, glm::value_ptr(camera->combined)); // projection matrix
 }

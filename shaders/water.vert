@@ -12,6 +12,7 @@ uniform vec3 sunDir;
 uniform float time;
 uniform mat4 shadowMatrix;
 
+out vec3 v_pos;
 out vec3 v_normal;
 out vec3 v_tangent;
 out vec2 v_texCoords;
@@ -116,6 +117,7 @@ float snoise(vec3 v) {
 
 void main()
 {
+    v_pos = a_pos;
     gl_Position = MVP * vec4(a_pos, 1); // temporary
     float waveMultiplier = max(.1, min(1., 1. - (gl_Position.z - 20.) / 100.));
 

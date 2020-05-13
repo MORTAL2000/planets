@@ -33,6 +33,7 @@ void main()
     float sunDot = dot(a_normal, sunDir);
 
     v_alpha *= clamp1(sunDot * 2.) + .5;
+    v_alpha += .5;
 
     float orangeDot = dot(a_normal, vec3(sunDir.x, 0, sunDir.z));
     float orange = clamp1(orangeDot * 10. - 4.5);

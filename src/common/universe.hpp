@@ -7,7 +7,8 @@
 
 class Universe {
     private:
-        double time;
+        double simulationTime = 0;
+        float simulationDt = 0;
         float simulationSpeed = 1.f;
 
         PlanetGenerator generator;
@@ -23,8 +24,9 @@ class Universe {
     public:
         Universe();
         
-        const double & getTime() const { return time; }
-        const float & getSpeed() const { return simulationSpeed; }
+        double getTime() const { return simulationTime; }
+        double getDeltaTime() const { return simulationDt; }
+        float getSpeed() const { return simulationSpeed; }
 
         void update(float dt);
 

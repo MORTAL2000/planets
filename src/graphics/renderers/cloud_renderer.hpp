@@ -24,5 +24,7 @@ class CloudRenderer: public Renderer
     SharedMesh quad;
     SharedTexture noiseTex;
     std::vector<Cloud> clouds;
+
+    void render(Planet * plt, double time, float deltaTime);
 };
 

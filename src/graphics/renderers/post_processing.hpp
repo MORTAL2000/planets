@@ -2,6 +2,7 @@
 
 // Local Headers
 #include "graphics/shader.hpp"
+#include "graphics/renderers/renderer.hpp"
 #include "graphics/texture_array.hpp"
 
 struct LensFlare
@@ -12,7 +13,7 @@ struct LensFlare
     bool rotate;
 };
 
-class PostProcessing {
+class PostProcessing: public Renderer {
     private:
         static const LensFlare flares[];
         SharedTexArray flareTextures;
@@ -22,5 +23,5 @@ class PostProcessing {
         void applyUniforms(Shader & shader);
     public: 
         PostProcessing();
-        void render();
+        void render(double dt);
 };

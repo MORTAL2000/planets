@@ -103,7 +103,7 @@ void Camera::orientUp(vec3 new_up)
 }
 
 
-void Camera::rotate(float degrees, glm::vec3 axis)
+void Camera::rotate(float degrees, glm::vec3 axis, CameraState & state)
 {
     float rads =  glm::radians(degrees);
     state.direction = glm::rotate(state.direction, rads, axis);
@@ -233,7 +233,13 @@ void Camera::calculate(float z_near, float z_far, float dt)
 {
     last_z_near = z_near;
     last_z_far = z_far;
-    projection = glm::perspective(glm::radians(fov), viewportWidth / viewportHeight, z_near, z_far);
+    if (mode == Perspective) {
+        projection = glm::perspective(glm::radians(fov), viewportWidth / viewportHeight, z_near, z_far);
+    } else if (mode == Orthographic) {
+        projection = glm::ortho<float>(viewportWidth * -.5, viewportWidth * .5, viewportHeight * -.5, viewportHeight * .5, z_near, z_far);
+    } else {
+        throw "Unknown camera mode";
+    }
 
     // If currently animating
     if (posT < posTotalTime) {

@@ -14,6 +14,8 @@ WaterRenderer::WaterRenderer() {
 
     foamTexture = ResourceManager::LoadTexture("textures/tc_foam.dds", "foam");
     seaWaves = ResourceManager::LoadTexture("textures/sea_waves.dds", "seaWaves");
+
+    Renderer::shadows = true;
 }
 
 void WaterRenderer::render(double dt) {
@@ -31,15 +33,13 @@ void WaterRenderer::render(double dt) {
 }
 
 void WaterRenderer::applyUniforms(Shader & shader) {
-    
-    Camera camera = Globals::scene->getCamera();
     Universe universe = Globals::scene->getUniverse();
 
     // glUniformMatrix4fv(shader.uniform("viewProjection"), 1, GL_FALSE, &camera.combined[0][0]);
     glUniform1f(shader.uniform("time"), universe.getTime());
     glUniform2f(shader.uniform("scrSize"), WindowSize::widthPixels, WindowSize::heightPixels);
-    glUniform3fv(shader.uniform("camPos"), 1, glm::value_ptr(camera.getPosition())); //camera.position.x, camera.position.y, camera.position.z);
-    glUniform3f(shader.uniform("sunDir"), camera.sunDir.x, camera.sunDir.y, camera.sunDir.z);
+    glUniform3fv(shader.uniform("camPos"), 1, glm::value_ptr(camera->getPosition())); //camera.position.x, camera.position.y, camera.position.z);
+    glUniform3fv(shader.uniform("sunDir"), 1, glm::value_ptr(camera->sunDir));
 
     // Bind Textures
     foamTexture->bind(0);
@@ -49,11 +49,15 @@ void WaterRenderer::applyUniforms(Shader & shader) {
     glUniform1i(shader.uniform("seaWaves"), 1);
 
     // Bind results from other buffers
-    Globals::scene->underwater_renderer.underwaterBuffer.colorTexture->bind(2);
+    Globals::scene->underwater_renderer->underwaterBuffer.colorTexture->bind(2);
     glUniform1i(shader.uniform("underwaterTexture"), 2);
 
-    Globals::scene->underwater_renderer.underwaterBuffer.depthTexture->bind(3);
+    Globals::scene->underwater_renderer->underwaterBuffer.depthTexture->bind(3);
     glUniform1i(shader.uniform("underwaterDepthTexture"), 3);
+
+    // Bind results from other buffers
+    Globals::scene->shadow_renderer->sunDepthTexture->bind(4);
+    glUniform1i(shader.uniform("shadowBuffer"), 4);
 
     // reflectionBuffer.colorTexture->bind(4,"reflectionTexture");
     // glUniform1i(shader.uniform("reflectionTexture"), 4);

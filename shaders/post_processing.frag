@@ -9,8 +9,8 @@ uniform sampler2D scene;
 uniform vec2 resolution;
 uniform float zoomEffect;
 
-// uniform sampler2D sceneDepth;
-// uniform float zoom;
+uniform sampler2D sceneDepth;
+uniform float zoom;
 
 const float near = .1, far = 2000.;
 
@@ -32,22 +32,25 @@ void zoomMotionBlur()
     }
 }
 
-// void fog()
-// {
-//     float depth = texture(sceneDepth, v_texCoords).r;
-//     depth = 2.0 * near * far / (far + near - (2.0 * depth - 1.0) * (far - near));
+void fog()
+{
+    float depth = texture(sceneDepth, v_texCoords).r;
+    depth = 2.0 * near * far / (far + near - (2.0 * depth - 1.0) * (far - near));
 
-//     float fog = max(0., min(1., (depth * .24 - 63. * (1. - zoom + .1)) * .1));
-//     fog *= min(1., max(0., (zoom - .42) * 4.6));
+    float fog = max(0., min(1., (depth * .24 - 63. * (1. - zoom + .1)) * .1));
+    fog *= min(1., max(0., (zoom - .42) * 4.6));
 
-//     if (depth > 200. && color.r + color.g + color.b > 1.85) fog = 0.;
+    if (depth > 200. && color.r + color.g + color.b > 1.85) fog = 0.;
 
-//     color.rgb *= 1. - fog;
-//     color.rgb += vec3(.45, .55, .9) * fog;
-// }
+    color.rgb *= 1. - fog;
+    color.rgb += vec3(.45, .55, .9) * fog;
+}
 
 void main()
 {
+    // float depthValue = texture(scene, v_texCoords).r;
+    // color = vec4(vec3(depthValue), 1.0);
+
     vec2 offset = v_texCoords * vec2(-2) + vec2(1);
     // chromatic aberration
     float r = texture(scene, v_texCoords + offset * .0010).r;
@@ -58,7 +61,7 @@ void main()
 
     zoomMotionBlur();
 
-    // fog();
+    fog();
 
     float vignette = smoothstep(3.0, .6, length(offset));
     color.rgb *= vignette;

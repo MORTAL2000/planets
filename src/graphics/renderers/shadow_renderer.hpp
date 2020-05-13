@@ -4,8 +4,9 @@
 #include "utils/math_utils.h"
 #include "graphics/frame_buffer.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/renderers/renderer.hpp"
 
-class ShadowRenderer
+class ShadowRenderer: public Renderer
 {
   public:
 
@@ -17,16 +18,12 @@ class ShadowRenderer
     );
 
     SharedTexture sunDepthTexture;
-    Camera sunCam;
 
     ShadowRenderer();
 
-    void begin(const Camera &mainCam, const vec3 &sunDir);
-
-    void end();
+    void render(double dt);
 
   private:
-
     FrameBuffer buffer;
-
+    void begin();
 };

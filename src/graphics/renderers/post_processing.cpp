@@ -5,6 +5,7 @@
 // #include "graphics/camera.hpp"
 // #include "common/universe.hpp"
 #include "utils/resource_manager.hpp"
+#include <glm/gtx/intersect.hpp>
 
 PostProcessing::PostProcessing()  {
     Shader shader = ResourceManager::LoadShader("post_processing.vert", "post_processing.frag", "post_processing");
@@ -62,12 +63,14 @@ const LensFlare PostProcessing::flares[] = {
     {0, vec4(.2, 1, .5, 1), .008, 1.81, false},
 };
 
-void PostProcessing::render() {
+void PostProcessing::render(double dt) {
 
     Shader shader = ResourceManager::GetShader("post_processing");
     shader.enable();
 
     glDisable(GL_DEPTH_TEST);
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     applyUniforms(shader);
     Mesh::getQuad()->render();
@@ -90,21 +93,22 @@ void PostProcessing::renderFlares(Shader & shader) {
     int steps = 50;
 
     const Universe & universe = Globals::scene->getUniverse();
-    const Camera & camera = Globals::scene->getCamera();
-    const glm::vec3 & cameraPosition = camera.getPosition();
-    
-    glm::vec2 x(0.f);
+    const glm::vec3 & cameraPosition = camera->getPosition();
+
     for (int i = 0; i < steps; i++)
     {
-        vec3 sd = glm::rotate(camera.sunDir, (float) (.05 * (((float) i - steps * .5) / steps)), mu::Y);
+        vec3 sd = glm::rotate(camera->sunDir, (float) (.05 * (((float) i - steps * .5) / steps)), mu::Y);
         vec3 sunPos = cameraPosition + sd;
 
         bool inViewport = false;
-        camera.project(sunPos, inViewport);
+        camera->project(sunPos, inViewport);
         bool intersectsPlanet = false;
 
-        for(Planet * planet : universe.getPlanets()) {
-            if (planet->rayToLonLat(cameraPosition, sd, x)) {
+        for (Planet * planet : universe.getPlanets()) {
+
+            float distance;
+            if (glm::intersectRaySphere(cameraPosition, sd, planet->get_position(), pow(planet->config.radius, 2), distance))
+            {
                 intersectsPlanet  = true;
                 break;
             }
@@ -112,12 +116,12 @@ void PostProcessing::renderFlares(Shader & shader) {
 
         if (!inViewport || intersectsPlanet)
             lensFlareA -= 1.0 / steps;
-    }
+     }
 
     lensFlareA = pow(lensFlareA, 2.);
     lensFlareA = lensFlareAlpha = (lensFlareA + lensFlareAlpha) * .5;
     
-    vec2 screenSunPos = camera.project(cameraPosition + camera.sunDir);
+    vec2 screenSunPos = camera->project(cameraPosition + camera->sunDir);
 
     lensFlareA *= 1.4 - length(screenSunPos);
     lensFlareA *= .45;
@@ -155,13 +159,17 @@ void PostProcessing::applyUniforms(Shader & shader) {
     
     glUniformMatrix4fv(shader.uniform("MVP"), 1, GL_FALSE, &(glm::mat4(1.f))[0][0]);
     glUniform1f(shader.uniform("zoomEffect"), Globals::scene->planetCamera.zoomVelocity / 2.);
-    // glUniform1f(shader.uniform("zoom"), Globals::scene->planetCamera.atmosphereTilt);
+    glUniform1f(shader.uniform("zoom"), Globals::scene->planetCamera.atmosphereTilt);
     glUniform2f(shader.uniform("resolution"), WindowSize::widthPixels, WindowSize::heightPixels);
 
     // Bind results from other buffers
-    Globals::scene->sceneBuffer->colorTexture->bind(0);
+    if (KeyInput::pressed(GLFW_KEY_Y)) {
+        Globals::scene->shadow_renderer->sunDepthTexture->bind(0);
+    } else {
+        Globals::scene->sceneBuffer->colorTexture->bind(0);
+    }
     glUniform1i(shader.uniform("scene"), 0);
 
-    // Globals::scene->sceneBuffer->depthTexture->bind(1);
-    // glUniform1i(shader.uniform("sceneDepth"), 1);
+    Globals::scene->sceneBuffer->depthTexture->bind(1);
+    glUniform1i(shader.uniform("sceneDepth"), 1);
 }

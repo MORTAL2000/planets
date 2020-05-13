@@ -132,13 +132,12 @@ void FrameBuffer::addDepthTexture(GLuint magFilter, GLuint minFilter)
 
     texture->Filter_Max = magFilter; // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
     texture->Filter_Min = minFilter; // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
-    texture->Internal_Format = GL_DEPTH_COMPONENT32F;
+    texture->Internal_Format = GL_DEPTH_COMPONENT;
     texture->Image_Format = GL_DEPTH_COMPONENT;
     texture->Texture_Type = GL_FLOAT;
     // glBindTexture(GL_TEXTURE_2D, texId) and glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     texture->generate(width, height, NULL);
     
-    // May not need this
     glBindTexture(GL_TEXTURE_2D, texture->id);
     
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture->id, 0);

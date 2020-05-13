@@ -51,7 +51,7 @@ public:
     const glm::mat4& get_last_model() { return _model_matrix; }
 
     virtual void set_position(const glm::vec3 & pos) { _origin = pos; }
-    virtual glm::vec3& get_position() { return _origin; }
+    virtual const glm::vec3& get_position() { return _origin; }
 
     glm::quat calculate_rotation(const glm::vec3 & direction);
 

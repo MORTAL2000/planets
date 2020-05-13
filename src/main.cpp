@@ -135,6 +135,8 @@ int main(int argc, char * argv[]) {
     Globals::scene = new Scene();
     check_gl_error();
 
+    Globals::scene->init();
+
     WindowSize::resize();
     Globals::scene->resize();
     check_gl_error();

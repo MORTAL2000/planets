@@ -106,11 +106,13 @@ vec2 Planet::deltaLonLat(vec2 a, vec2 b)
     );
 }
 
-bool Planet::rayToLonLat(const glm::vec3 &rayOrigin, const glm::vec3 &rayDirection, glm::vec2 &lonLat) const
+bool Planet::rayToLonLat(const glm::vec3 &rayOrigin, const glm::vec3 &rayDirection, glm::vec2 &lonLat)
 {
     glm::vec3 intersection, normal;
-    if (glm::intersectRaySphere(rayOrigin, rayDirection, glm::vec3(0.f), config.radius, intersection, normal))
+    const glm::vec3 & position = this->get_position();
+    if (glm::intersectRaySphere(rayOrigin, rayDirection, position, config.radius, intersection, normal))
     {
+        intersection -= position;
         lonLat.x = longitude(intersection.x, intersection.z);
         lonLat.y = latitude(intersection.y);
         return true;

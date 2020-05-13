@@ -44,7 +44,9 @@ Scene::Scene():
 
     check_gl_error();
     MouseInput::setLockedMode(!camPlanetMode);
+}
 
+void Scene::init() {
     // Setup renderers
     renderers.push_back(new SunRenderer());
     renderers.push_back(new TerrainRenderer());
@@ -53,6 +55,10 @@ Scene::Scene():
     renderers.push_back(new AtmosphereRenderer());
     renderers.push_back(new CloudRenderer());
     renderers.push_back(new PathRenderer());
+
+    underwater_renderer = new UnderwaterRenderer();
+    shadow_renderer = new ShadowRenderer();
+    post_processing = new PostProcessing();
 }
 
 void Scene::update(float dt) {
@@ -100,8 +106,10 @@ void Scene::draw(float dt) {
    
     glEnable(GL_BLEND);
 
+    shadow_renderer->render(dt);
+
     // Render shadows
-    underwater_renderer.render(dt);
+    underwater_renderer->render(dt);
     check_gl_error();
 
     sceneBuffer->bind();
@@ -122,7 +130,7 @@ void Scene::draw(float dt) {
     glEnable(GL_BLEND);
 
     // Post Processing
-    post_processing.render();
+    post_processing->render(dt);
     check_gl_error();
 }
 

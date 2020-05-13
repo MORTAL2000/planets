@@ -87,8 +87,9 @@ void Universe::generateOrbitalData() {
 void Universe::update(float dt) {
 
     simulationSpeed *= (KeyInput::justPressed(GLFW_KEY_KP_ADD) ? 2 : (KeyInput::justPressed(GLFW_KEY_KP_SUBTRACT) ? .5 : 1));
-
-    time += simulationSpeed * dt;
+    simulationDt = simulationSpeed * dt;
+    simulationTime += simulationDt;
+    
 
     if (Globals::scene->selected && KeyInput::justPressed(GLFW_KEY_R))
     {
@@ -100,7 +101,7 @@ void Universe::update(float dt) {
     {
         if (planets[i] == center) continue;
 
-        planets[i]->update(time);
+        planets[i]->update(simulationTime);
     }
 
     if (debugOpen) PlanetGenerator::ShowDebugWindow(&debugOpen);

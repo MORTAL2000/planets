@@ -38,10 +38,10 @@ CameraState FlyingCamera::calculate(float dt)
         state.position += state.right * glm::vec3(-dt * speedMultiplier);
 
     if (KeyInput::pressed(GLFW_KEY_Q))
-        camera->rotate(-dt * speedMultiplier, state.direction);
+        camera->rotate(-dt * speedMultiplier, state.direction, state);
 
     if (KeyInput::pressed(GLFW_KEY_E))
-        camera->rotate(dt * speedMultiplier, state.direction);
+        camera->rotate(dt * speedMultiplier, state.direction, state);
 
     if (KeyInput::pressed(GLFW_KEY_LEFT_SHIFT))
         state.position -= state.up * glm::vec3(dt * speedMultiplier);
@@ -50,10 +50,10 @@ CameraState FlyingCamera::calculate(float dt)
         state.position += state.up * glm::vec3(dt * speedMultiplier);
 
     if (MouseInput::deltaMouseX != 0)
-        camera->rotate(MouseInput::deltaMouseX / WindowSize::width * -100 * mouseSensivity, state.up);
+        camera->rotate(MouseInput::deltaMouseX / WindowSize::width * -100 * mouseSensivity, state.up, state);
 
     if (MouseInput::deltaMouseY != 0)
-        camera->rotate(MouseInput::deltaMouseY / WindowSize::height * -100 * mouseSensivity, state.right);
+        camera->rotate(MouseInput::deltaMouseY / WindowSize::height * -100 * mouseSensivity, state.right, state);
     
     // std::cout << glm::to_string(camera->position) << std::endl;
     // camera->update();

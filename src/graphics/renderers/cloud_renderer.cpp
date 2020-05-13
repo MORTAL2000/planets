@@ -20,27 +20,38 @@ CloudRenderer::CloudRenderer():
     VertBuffer::uploadSingleMesh(quad);
 
     VertAttributes verts;
-    verts.add({"SPAWNPOINT", 3});
+    unsigned int spawnpoint_offset = verts.add({"SPAWNPOINT", 3});
 
-    VertData spawnpoints(verts, std::vector<u_char>(nrOfSpawnpoints * 4 * 3));
-    for (int i = 0; i < nrOfSpawnpoints; i++)
-        spawnpoints.set(
-                vec3(mu::random() - .5, (mu::random() - .5) * .3, mu::random() - .5)
-                * vec3(1 + i * .2) * vec3(110.),
-                i, 0
-        );
+    const Universe & universe = Globals::scene->getUniverse();
+    const std::vector<Planet * > & planets = universe.getPlanets();
+
+    VertData spawnpoints(verts, std::vector<u_char>(nrOfSpawnpoints * 4 * 3 * planets.size()));
+    // for (int p = 0; p < planets.size(); p++) {
+        int p = 0;
+        for (int i = 0; i < nrOfSpawnpoints; i++) {
+            glm::vec3 spawn = glm::vec3(mu::random() - .5, (mu::random() - .5) * .3, mu::random() - .5) * vec3(1 + i * .2) * vec3(110.);
+            // spawn += planets[p]->get_position();
+            spawnpoints.set(spawn, p * nrOfSpawnpoints + i, spawnpoint_offset);
+        }
+    // }
 
     quad->vertBuffer->uploadPerInstanceData(spawnpoints, particlesPerOffset);
 }
 
-void CloudRenderer::render(double dt)
-{
-    Camera camera = Globals::scene->getCamera();
-    Universe universe = Globals::scene->getUniverse();
+void CloudRenderer::render(double realtimeDT) {
+    const Universe & universe = Globals::scene->getUniverse();
+    const std::vector<Planet * > & planets = universe.getPlanets();
 
+    for (Planet * planet : universe.getPlanets()) {
+        // The dt above is real time. The universe dt is the simulations. 
+        render(planet, universe.getTime(), universe.getDeltaTime());
+    }
+}
+
+void CloudRenderer::render(Planet * planet, double time, float deltaTime)
+{
     float planetRadius = 150;
 
-    if (clouds.size() == 0) dt = 30;
     while (clouds.size() < 40)
         clouds.push_back({
             mu::random(360), // lon
@@ -54,7 +65,7 @@ void CloudRenderer::render(double dt)
     Shader shader = ResourceManager::GetShader("clouds");
     shader.enable();
 
-    glUniform1f(shader.uniform("time"), universe.getTime());
+    glUniform1f(shader.uniform("time"), time);
    
     noiseTex->bind(0);
     glUniform1i(shader.uniform("noiseTex"), 0);
@@ -65,30 +76,33 @@ void CloudRenderer::render(double dt)
     {
         auto &cloud = clouds[i];
 
-        cloud.timeSinceSpawn += dt;
-        cloud.timeToDespawn -= dt;
+        cloud.timeSinceSpawn += deltaTime;
+        cloud.timeToDespawn -= deltaTime;
 
         if (cloud.timeToDespawn <= 0) clouds.erase(clouds.begin() + i);
 
-        cloud.lon += .7 * dt * cloud.speed;
-        cloud.lat += .4 * dt * cloud.speed;
+        cloud.lon += .7 * deltaTime * cloud.speed;
+        cloud.lat += .4 * deltaTime * cloud.speed;
+        
+        glm::mat4 transformFromCenter = rotate(glm::mat4(1.f), glm::radians(cloud.lon), mu::Y);
+        transformFromCenter = rotate(transformFromCenter, glm::radians(cloud.lat), mu::X);
+        transformFromCenter = translate(transformFromCenter, vec3(0, planet->config.radius + planet->config.cloudHeight, 0));
 
-        mat4 t = rotate(mat4(1.), cloud.lon * mu::DEGREES_TO_RAD, mu::Y);
-        t = rotate(t, cloud.lat * mu::DEGREES_TO_RAD, mu::X);
-        t = translate(t, vec3(0, planetRadius + 35, 0));
+        glm::mat4 transformFromCenterInverse = glm::inverse(transformFromCenter);
 
-        CameraState state = camera.getState();
-        glm::vec3 up = inverse(t) * vec4(state.up, 0);
-        glm::vec3 right = inverse(t) * vec4(state.right, 0);
-        t = camera.combined * t;
+        CameraState state = camera->getState();
+        glm::vec3 up = transformFromCenterInverse * vec4(state.up, 0);
+        glm::vec3 right = transformFromCenterInverse * vec4(state.right, 0);
+ 
+        glm::mat4 transform = camera->combined * planet->get_last_model() * transformFromCenter;
 
         float light = 0;
         light += max(0.f, 1 - Interpolation::circleIn(min(1., cloud.lat / 30.)));
         light += max(0.f, 1 - Interpolation::circleIn(min(1., (180 - cloud.lat) / 30.)));
 
-        light += min(1.f, max(0.0f, dot(rotate(vec3(0, 0, 1), cloud.lon * mu::DEGREES_TO_RAD, mu::Y), camera.sunDir) + .8f));
+        light += min(1.f, max(0.0f, dot(rotate(vec3(0, 0, 1), cloud.lon * mu::DEGREES_TO_RAD, mu::Y), camera->sunDir) + .8f));
 
-        glUniformMatrix4fv(shader.uniform("mvp"), 1, GL_FALSE, &t[0][0]);
+        glUniformMatrix4fv(shader.uniform("mvp"), 1, GL_FALSE, glm::value_ptr(transform));
         glUniform3f(shader.uniform("up"), up.x, up.y, up.z);
         glUniform3f(shader.uniform("right"), right.x, right.y, right.z);
         glUniform1f(shader.uniform("cloudOpacity"), Interpolation::circleIn(max(0.f, min(cloud.timeToDespawn, cloud.timeSinceSpawn)) / 20.));

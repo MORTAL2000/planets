@@ -32,6 +32,8 @@ TerrainRenderer::TerrainRenderer() {
     // sand = ResourceManager::LoadTexture("textures/tc_sand.dds", "sand");
     // snow = ResourceManager::LoadTexture("textures/snow512.tga", "snow");
 
+    Renderer::shadows = true;
+
     check_gl_error();
 }
 
@@ -67,7 +69,6 @@ void TerrainRenderer::render(double dt) {
 
 void TerrainRenderer::applyUniforms(Shader & shader) {
     
-    Camera camera = Globals::scene->getCamera();
     // Universe universe = Globals::scene->getUniverse();
 
     // Using an identity model for now
@@ -76,7 +77,7 @@ void TerrainRenderer::applyUniforms(Shader & shader) {
     // glUniform1f(shader.uniform("time"), universe.getTime());
     // glUniform2f(shader.uniform("scrSize"), WindowSize::widthPixels, WindowSize::heightPixels);
     // glUniform3f(shader.uniform("camPos"), camera.position.x, camera.position.y, camera.position.z);
-    glUniform3f(shader.uniform("sunDir"), camera.sunDir.x, camera.sunDir.y, camera.sunDir.z);
+    glUniform3f(shader.uniform("sunDir"), camera->sunDir.x, camera->sunDir.y, camera->sunDir.z);
     // glUniform3f(shader.uniform("planetCenter"), 0.f, 0.f, 0.f);
     // glUniform1f(shader.uniform("seaLevel"), 150.f);
     
@@ -91,10 +92,8 @@ void TerrainRenderer::applyUniforms(Shader & shader) {
     glUniform1i(shader.uniform("terrainTextures"), 0);
 
     // Bind results from other buffers
-    Globals::scene->shadow_renderer.sunDepthTexture->bind(1);
-    glUniform1i(shader.uniform("shadowBuffer"), 1); 
-    mat4 shadowMatrix = ShadowRenderer::BIAS_MATRIX * Globals::scene->shadow_renderer.sunCam.combined;
-    glUniformMatrix4fv(shader.uniform("shadowMatrix"), 1, GL_FALSE, &((shadowMatrix)[0][0]));
+    Globals::scene->shadow_renderer->sunDepthTexture->bind(1);
+    glUniform1i(shader.uniform("shadowBuffer"), 1);
 
     // grass->bind(2);
     // glUniform1i(shader.uniform("grassTexture"), 2);

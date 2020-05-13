@@ -10,8 +10,11 @@ layout(location = 5) in float a_y;
 
 uniform mat4 MVP;
 uniform vec3 sunDir;
-uniform mat4 shadowMatrix;
 
+uniform mat4 shadowMatrix;
+out vec4 shadowMapCoords;
+
+out vec3 v_pos;
 out vec2 v_texCoord;
 out vec4 v_texBlend;
 out float v_y;
@@ -22,9 +25,10 @@ out vec3 v_toCamera;
 
 out float v_dayLight;
 
-out vec4 shadowMapCoords;
+
 
 void main() {
+    v_pos = a_pos;
     gl_Position = MVP * vec4(a_pos, 1);
     v_texCoord = a_texCoords * 4.;
     v_texBlend = a_texBlend;
