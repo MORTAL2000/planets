@@ -23,7 +23,7 @@ static PlanetConfig getEarth2Config() {
     config.radius = EARTH_RADIUS / 2.f;
     config.mass = 0.5;
 
-    config.orbit.eccentricity = 0;
+    config.orbit.eccentricity = 0.2;
     // config.color = glm::vec3(0.f, 0.f, 1.f);
     // config.center = glm::vec3(300, 0, 300);
 
@@ -53,7 +53,7 @@ Universe::Universe() {
     renderables.push_back(earth);
 
     Planet * earth2 = new Planet(getEarth2Config());
-    earth2->set_position(glm::vec3(0.f, 0.f, 300.f));
+    earth2->set_position(glm::vec3(0.f, 0.f, 600.f));
     generator.generate(earth2);
     planets.push_back(earth2);
     renderables.push_back(earth2);

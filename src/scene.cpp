@@ -38,9 +38,7 @@ Scene::Scene():
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    // check_gl_error();
-
-    // add_renderable(universe.getPlanet());
+    check_gl_error();
 
     check_gl_error();
     MouseInput::setLockedMode(!camPlanetMode);

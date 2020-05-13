@@ -9,7 +9,6 @@ uniform mat4 atmoModel;
 
 uniform vec3 sunDir;
 uniform vec3 camPos;
-uniform float camDist;
 
 out vec3 v_color;
 out float v_alpha;
@@ -21,22 +20,28 @@ float clamp1(float x)
 
 void main()
 {
-    gl_Position = MVP * atmoModel * vec4(a_pos, 1);
+    gl_Position = MVP * vec4(a_pos, 1);
 
-    float camDot = 1. - dot(a_normal, vec3(0, 1, 0));
-    float edge = camDot * 12. - (camDist / 150.);
-    edge = clamp1(edge);
-    float middle = camDot * 9. * max(.1, clamp1(1. - camDist / 500.));
-    middle = clamp1(middle);
-    v_alpha = middle - edge;
+    // v_alpha = 0.1;
+    // v_color = vec3(.3, .5, 1);
 
-    float sunDot = dot(a_normal, sunDir);
+    // camDist;
+    // camPos;
+    sunDir;
 
-    v_alpha *= clamp1(sunDot * 2.) + .5;
-    v_alpha += .5;
+    float highlight = pow(clamp1(dot(a_normal, sunDir) + 0.5), 2) + 0.1;
+    float shadow = clamp1(dot(a_normal, sunDir));
+    
+    // float camDot;
+    // float edge = 1.0;
+    // float middle = camDot * 9. * max(.1, clamp1(1. - camDist / 500.));
+    // middle = clamp1(middle);
+    // v_alpha = middle - edge;
 
-    float orangeDot = dot(a_normal, vec3(sunDir.x, 0, sunDir.z));
-    float orange = clamp1(orangeDot * 10. - 4.5);
+    // float sunDot = dot(a_normal, sunDir);
 
-    v_color = vec3(.3, .5, 1) * edge + vec3(.6, .75, 1) * (1. - edge);
+    // v_alpha *= clamp1(sunDot * 2.) + .5;
+    // v_alpha += .5;
+    v_alpha = 0.2;
+    v_color = vec3(.3, .5, 1) * highlight;
 }
