@@ -25,26 +25,6 @@ cmake -G "Visual Studio 14 Win64" ..
 ...
 ```
 
-If you compile and run, you should now be at the same point as the [Hello Window](http://www.learnopengl.com/#!Getting-started/Hello-Window) or [Context Creation](https://open.gl/context) sections of the tutorials. Open [main.cpp](https://github.com/Polytonic/Glitter/blob/master/Glitter/Sources/main.cpp) on your computer and start writing code!
-
-## Documentation
-Many people overlook how frustrating it is to install dependencies, especially in environments lacking package managers or administrative privileges. For beginners, just getting set up properly set up can be a huge challenge. Glitter is meant to help you overcome that roadblock.
-
-Glitter provides the most basic windowing example. It is a starting point, and tries very hard not to enforce any sort of directory structure. Feel free to edit the include paths in `CMakeLists.txt`. Glitter bundles most of the dependencies needed to implement a basic rendering engine. This includes:
-
-Functionality           | Library
------------------------ | ------------------------------------------
-Mesh Loading            | [assimp](https://github.com/assimp/assimp)
-Physics                 | [bullet](https://github.com/bulletphysics/bullet3)
-OpenGL Function Loader  | [glad](https://github.com/Dav1dde/glad)
-Windowing and Input     | [glfw](https://github.com/glfw/glfw)
-OpenGL Mathematics      | [glm](https://github.com/g-truc/glm)
-Texture Loading         | [stb](https://github.com/nothings/stb)
-
-If you started the tutorials by installing [SDL](https://www.libsdl.org/), [GLEW](https://github.com/nigels-com/glew), or [SOIL](http://www.lonesock.net/soil.html), *stop*. The libraries bundled with Glitter supersede or are functional replacements for these libraries.
-
-I have provided sample implementations of an intrusive tree mesh and shader class, if you're following along with the tutorials and need another reference point. These were used to generate the screenshot above, but will not compile out-of-the-box. I leave that exercise for the reader. :smiley:
-
 ## License
 >The MIT License (MIT)
 
